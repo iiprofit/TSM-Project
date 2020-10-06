@@ -1,10 +1,10 @@
 declare interface ITmsWebPartWebPartStrings {
-  PropertyPaneDescription: string;
-  BasicGroupName: string;
-  DescriptionFieldLabel: string;
+    PropertyPaneDescription: string
+    BasicGroupName: string
+    DescriptionFieldLabel: string
 }
 
-declare module 'TmsWebPartWebPartStrings' {
-  const strings: ITmsWebPartWebPartStrings;
-  export = strings;
+declare module "TmsWebPartWebPartStrings" {
+    const strings: ITmsWebPartWebPartStrings
+    export = strings
 }

@@ -1,11 +1,11 @@
-import * as React from "react";
+import * as React from "react"
 
 type INotValidatedProps = {
-  items: Array<string>;
-};
+    items: Array<string>
+}
 
-const NotValidated: React.SFC<INotValidatedProps> = props => (
-<div></div>
-);
+const NotValidated: React.FunctionComponent<INotValidatedProps> = (props) => (
+    <div></div>
+)
 
-export default NotValidated;
+export default NotValidated

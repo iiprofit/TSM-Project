@@ -10,29 +10,33 @@ $font: Roboto, Segoe UI Web (West European), Segoe UI, Verdana, -apple-system,
   BlinkMacSystemFont, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
 
 $theme-colors: (
-  "primary": #055982
+  "primary": #055982,
 );
 
+#workbenchPageContent,
+.CanvasZone {
+  max-width: 100%;
+}
 
 .unauthorized {
-    border: 1px solid darken($secondary-color, 15%);
-    text-align: center;
-    font-family: $font;
-    .header {
-      border-bottom: 2px solid $border-color;
-      margin-bottom: 5px;
-      padding: 8px;
-      position: relative;
-      background-color: #055982;
-      color: white;
-      text-align: right;
-    }
-    .smiley {
-      font-size: 72px;
-    }
+  border: 1px solid darken($secondary-color, 15%);
+  text-align: center;
+  font-family: $font;
+  .header {
+    border-bottom: 2px solid $border-color;
+    margin-bottom: 5px;
+    padding: 8px;
+    position: relative;
+    background-color: #055982;
+    color: white;
+    text-align: right;
   }
+  .smiley {
+    font-size: 72px;
+  }
+}
 
-  .dashboardHeader  {
-    padding-bottom: 5%;
-    border: 1px solid #388e3c;
-  }
+.dashboardHeader {
+  padding-bottom: 5%;
+  border: 1px solid #388e3c;
+}

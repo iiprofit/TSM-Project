@@ -1,27 +1,27 @@
 /**
  * SPHttp Package Import.
  * Both Packages Are Used For Configuration.
- * 
+ *
  */
-import { SPHttpClientConfiguration, SPHttpClient } from "@microsoft/sp-http";
+import { SPHttpClientConfiguration, SPHttpClient } from "@microsoft/sp-http"
 
 /**
  * Parameters For CreateItemParams Method
  */
 type ItemParam = {
-  absoluteUrl: string;
-  listTitle: string;
-  body: any;
-};
+    absoluteUrl: string
+    listTitle: string
+    body: any
+}
 
 /**
  * These Are Types Of Above Parameters.
  */
 type createItem = {
-  url: string;
-  config: SPHttpClientConfiguration;
-  options: any;
-};
+    url: string
+    config: SPHttpClientConfiguration
+    options: any
+}
 
 /**
  * This Is Re-Usable Method.
@@ -31,21 +31,20 @@ type createItem = {
 export const createItemParams = ({
     absoluteUrl,
     body,
-    listTitle
-  }: ItemParam): createItem => {
-    const url = `${absoluteUrl}/_api/web/lists/getbytitle('${listTitle}')/items`;
+    listTitle,
+}: ItemParam): createItem => {
+    const url = `${absoluteUrl}/_api/web/lists/getbytitle('${listTitle}')/items`
     const data = {
-      headers: {
-        accept: "application/json;odata=nometadata",
-        "content-type": "application/json;odata=verbose",
-        "odata-version": ""
-      },
-      body: JSON.stringify(body)
-    };
+        headers: {
+            accept: "application/json;odata=nometadata",
+            "content-type": "application/json;odata=verbose",
+            "odata-version": "",
+        },
+        body: JSON.stringify(body),
+    }
     return {
-      url: url,
-      config: SPHttpClient.configurations.v1,
-      options: data
-    };
-  };
-  
+        url: url,
+        config: SPHttpClient.configurations.v1,
+        options: data,
+    }
+}

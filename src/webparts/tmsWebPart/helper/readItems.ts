@@ -1,25 +1,25 @@
 /**
  * Parameters For CreateItemParams Method
  */
-import { SPHttpClientConfiguration, SPHttpClient } from "@microsoft/sp-http";
+import { SPHttpClientConfiguration, SPHttpClient } from "@microsoft/sp-http"
 
 /**
  * These Are Types Of Above Parameters.
  */
 type ItemParam = {
-  absoluteUrl: string;
-  listTitle: string;
-  filters: string;
-};
+    absoluteUrl: string
+    listTitle: string
+    filters: string
+}
 
 /**
  * These Are Types Of Above Parameters.
  */
 type readItems = {
-  url: string;
-  config: SPHttpClientConfiguration;
-  options: any;
-};
+    url: string
+    config: SPHttpClientConfiguration
+    options: any
+}
 
 /**
  * This Is Re-Usable Method.
@@ -28,20 +28,20 @@ type readItems = {
  */
 
 export const readItemsParams = ({
-  absoluteUrl,
-  listTitle,
-  filters,
+    absoluteUrl,
+    listTitle,
+    filters,
 }: ItemParam): readItems => {
-  const url = `${absoluteUrl}/_api/web/lists/getbytitle('${listTitle}')/items?${filters}`;
-  const data = {
-    headers: {
-      Accept: "application/json;odata=nometadata",
-      "odata-version": "",
-    },
-  };
-  return {
-    url: url,
-    config: SPHttpClient.configurations.v1,
-    options: data,
-  };
-};
+    const url = `${absoluteUrl}/_api/web/lists/getbytitle('${listTitle}')/items?${filters}`
+    const data = {
+        headers: {
+            Accept: "application/json;odata=nometadata",
+            "odata-version": "",
+        },
+    }
+    return {
+        url: url,
+        config: SPHttpClient.configurations.v1,
+        options: data,
+    }
+}

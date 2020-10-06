@@ -1,25 +1,25 @@
 /**
  * React Package Import
  */
-import * as React from "react";
+import * as React from "react"
 
 /**
  * Sucess Dialog Props Creation.
  */
 interface ISuccessDialogProps {
-  title: string;
-  show: boolean;
-  onHide: () => void;
+    title: string
+    show: boolean
+    onHide: () => void
 }
 
 /**
  * Main Method For Success Dialog.
  */
 const SuccessDialog: React.SFC<ISuccessDialogProps> = (props) => {
-  return <div></div>;
-};
+    return <div></div>
+}
 
 /**
  * Export SuccessDialog Method
  */
-export default SuccessDialog;
+export default SuccessDialog
