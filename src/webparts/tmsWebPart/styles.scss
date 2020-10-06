@@ -1,0 +1,38 @@
+$border-color: #e6e6e6;
+$primary-color: #055982;
+$secondary-color: #6cb644;
+$light-secondary-color: #88c667;
+$red-color: #d32f2f;
+$green-color: #388e3c;
+$orange-color: #ff8d00;
+$gray-color: #808080;
+$font: Roboto, Segoe UI Web (West European), Segoe UI, Verdana, -apple-system,
+  BlinkMacSystemFont, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+
+$theme-colors: (
+  "primary": #055982
+);
+
+
+.unauthorized {
+    border: 1px solid darken($secondary-color, 15%);
+    text-align: center;
+    font-family: $font;
+    .header {
+      border-bottom: 2px solid $border-color;
+      margin-bottom: 5px;
+      padding: 8px;
+      position: relative;
+      background-color: #055982;
+      color: white;
+      text-align: right;
+    }
+    .smiley {
+      font-size: 72px;
+    }
+  }
+
+  .dashboardHeader  {
+    padding-bottom: 5%;
+    border: 1px solid #388e3c;
+  }
