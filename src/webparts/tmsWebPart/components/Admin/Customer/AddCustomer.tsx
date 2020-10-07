@@ -278,7 +278,7 @@ class AddCustomer extends React.Component<
             absoluteUrl: absUrl,
             listTitle: listTitles.CUSTOMER_INFORMATION,
             body: {
-                __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                __metadata: { type: "SP.Data.CustomerInformationListItem" },
                 CustomerName: customerName,
                 CustomerEmail: customerEmail,
                 CustomerCity: customerCity,
