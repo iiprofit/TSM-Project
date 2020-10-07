@@ -31,6 +31,7 @@ import {
     DatePicker,
     Form,
     message,
+    Space,
 } from "antd"
 
 /**
@@ -85,7 +86,7 @@ type INewTicketStates = {
     priority?: Array<any>
     prioritySelected: Array<any>
     assignedTo?: Array<any>
-    assignedToSelected: Array<any>
+    assignedToSelected: any
     dueDate?: moment.Moment
     ticketStatus?: Array<any>
     ticketStatusSelected: Array<any>
@@ -332,25 +333,22 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
 
                         {/* Action Button Section Start */}
                         <Form.Item>
-                            <Row align="middle">
-                                <Col span={3} offset={4}>
-                                    <Button
-                                        type="primary"
-                                        loading={isButtonLoading}
-                                        onClick={this.handleSubmit}
-                                    >
-                                        Submit
-                                    </Button>
-                                </Col>
-                                <Col span={3} offset={10}>
-                                    <Button
-                                        type="primary"
-                                        onClick={this.onCancelClick}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Col>
-                            </Row>
+                            <Space>
+                                <Button
+                                    type="primary"
+                                    loading={isButtonLoading}
+                                    onClick={this.handleSubmit}
+                                    className="mr-2"
+                                >
+                                    Submit
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    onClick={this.onCancelClick}
+                                >
+                                    Cancel
+                                </Button>
+                            </Space>
                         </Form.Item>
                         {/* Action Button Section End */}
                     </Form>
@@ -364,6 +362,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
      */
     private generateTicketId = ({ id }) => {
         try {
+            console.log(id)
             let newId = id + 1
             let len = id.toString().length
             let missingLen = 4 - len
@@ -418,6 +417,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 return {
                     value: x.EmailId ? x.EmailId : "",
                     text: x.FirstName ? x.FirstName : "",
+                    email: x.EmailId ? x.Email.EMail : "",
                 }
             })
             this.setState({ assignedTo: _result })
@@ -539,11 +539,11 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             } = this.state
 
             if (
-                productNameSelected ||
-                ticketStatusSelected ||
-                prioritySelected ||
-                customerNameSelected ||
-                assignedToSelected ||
+                !productNameSelected ||
+                !ticketStatusSelected ||
+                !prioritySelected ||
+                !customerNameSelected ||
+                !assignedToSelected ||
                 ticketTitle == ""
             ) {
                 message.info("Invalid Entries. Please Fill All the fields")
@@ -565,11 +565,12 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             const { absUrl, httpClient } = this.props
             const {
                 assignedToSelected,
+                assignedTo,
                 customerNameSelected,
                 prioritySelected,
                 productNameSelected,
                 ticketNo,
-                ticketStatus,
+                ticketStatusSelected,
                 ticketTitle,
                 dueDate,
             } = this.state
@@ -586,8 +587,10 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 params.options
             )
             let result = await response.json()
-
-            let ticketId = this.generateTicketId({ id: result.Id })
+            console.log(result)
+            let ticketId = this.generateTicketId({
+                id: result.value ? result.value[0].Id : 0,
+            })
 
             // Create transaction into Checklist Transaction table
             params = createItemParams({
@@ -595,17 +598,16 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 listTitle: listTitles.TICKET_INFORMATION_TABLE,
                 body: {
                     __metadata: {
-                        type: "SP.Data.CheckListTransactionListItem",
+                        type: "SP.Data.TicketInformationTableListItem",
                     },
                     TicketNo: ticketId,
                     Title: ticketTitle,
-                    CustomerId: customerNameSelected,
-                    ProductId: productNameSelected,
-                    TicketPriorty: prioritySelected,
-                    AssignedTo: assignedToSelected,
+                    CustomerDetailsId: customerNameSelected,
+                    ProductIdId: productNameSelected,
+                    TicketPriority: prioritySelected,
+                    AssignedToId: assignedToSelected,
                     TicketDueDate: dueDate.format("YYYY-MM-DD"),
-                    StatusId: ticketStatus,
-                    uuid: uuid.v4(),
+                    StatusIdId: ticketStatusSelected,
                 },
             })
             response = await httpClient.post(
@@ -632,7 +634,10 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
           <p>Ticket has been created.</p>`,
                     From: "",
                     Subject: `Ticket Created - Ticket Id - ${ticketId} `,
-                    To: assignedToSelected,
+                    To: [
+                        assignedTo.find((x) => x.value == assignedToSelected)
+                            .email,
+                    ],
                 },
             })
 

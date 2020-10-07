@@ -3,11 +3,9 @@
  */
 import * as React from "react"
 
-import { Tabs } from "antd"
-
+import { Tabs, Row, Col, Button } from "antd"
 const { TabPane } = Tabs
-
-import { Route } from "react-router-dom"
+import { Route, Link } from "react-router-dom"
 /**
  * React-Redux Method Import.
  * This Function Connect Current Component With React-Redux
@@ -71,6 +69,15 @@ class TicketSection extends React.Component<
         return (
             <>
                 <>
+                    <Row gutter={[16, 16]}>
+                        <Col span={12}>
+                            <Link to="/new-ticket">
+                                <Button type="primary" size="middle">
+                                    Add Ticket
+                                </Button>
+                            </Link>
+                        </Col>
+                    </Row>
                     <Tabs
                         onChange={this.onTabSelect}
                         activeKey={this.state.activeTab}

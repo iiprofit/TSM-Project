@@ -166,15 +166,11 @@ class ClossedTickets extends React.Component<
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
                             <Row>
-                                <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
+                                {/* <Col span={12}>
+                                    <Button type="primary" size="middle">
                                         Add Ticket
                                     </Button>
-                                </Col>
+                                </Col> */}
                                 <Col span={12}>
                                     <Space>
                                         <Input

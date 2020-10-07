@@ -23,6 +23,7 @@ import { IInProgressTicketsProp } from "../../../Store/Types"
  * Ant Deisgn Component Imports
  */
 import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
+import { Link } from "react-router-dom"
 
 /**
  * Ant Design Icons Import
@@ -167,15 +168,13 @@ class InProgressTickets extends React.Component<
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
                             <Row>
-                                <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
-                                        Add Ticket
-                                    </Button>
-                                </Col>
+                                {/* <Col span={12}>
+                                    <Link to="/new-ticket">
+                                        <Button type="primary" size="middle">
+                                            Add Ticket
+                                        </Button>
+                                    </Link>
+                                </Col> */}
                                 <Col span={12}>
                                     <Space>
                                         <Input
