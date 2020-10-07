@@ -40,6 +40,7 @@ import TicketSection from "./TicketSection/TicketSection"
 import DueTodayTickets from "./TicketSection/DueTodayTicket/DueTodayTickets"
 // import InProgrssTickets from "./InProgressTickets/InProgressTickets";
 import NewTicket from "./TicketSection/NewTicket/NewTicket"
+import EditTicket from "./TicketSection/EditTicket/EditTicket"
 
 /**
  * Declaring Types Of Compoent States
@@ -114,6 +115,10 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                                 component={TicketSection}
                             />
                             <Route path="/new-ticket" component={NewTicket} />
+                            <Route
+                                path="/edit-ticket/:id"
+                                component={EditTicket}
+                            />
                         </TabPane>
                         <TabPane tab="Search Section" key="searchsection">
                             <Route

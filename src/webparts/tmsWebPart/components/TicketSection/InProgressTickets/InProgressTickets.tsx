@@ -127,17 +127,22 @@ class InProgressTickets extends React.Component<
                 title: "Actions",
                 dataIndex: "actions",
                 key: "actions",
-                render: (text, record) => (
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
-                ),
+                render: (text, record) => {
+                    console.log(record)
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-ticket/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
+                },
             } as any,
         ],
         rowData: [],

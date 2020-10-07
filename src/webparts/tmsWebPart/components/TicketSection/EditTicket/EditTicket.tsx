@@ -11,7 +11,7 @@ import * as moment from "moment"
 
 // ! local imports
 //Component Specific CSS Import
-import "./StatusType.scss"
+// import "./StatusType.scss"
 
 import {
     readItemParams,
@@ -553,9 +553,12 @@ class IEditTicket extends React.Component<IEditTicketProp, IEditTicketStates> {
                 etag: response.headers.get("ETag"),
             })
             const _item = result
+            console.log(result)
             this.setState({
                 ticketTitle: _item.Title,
-                customerName: _item.CustomerDetails.CustomerName,
+                customerNameSelected: this.state.customerName.find(
+                    (x) => x.value == _item.CustomerDetailsId
+                ).CustomerDetailsId,
             })
         } catch (error) {
             console.error(error)

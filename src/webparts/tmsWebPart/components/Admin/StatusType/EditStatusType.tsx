@@ -6,7 +6,7 @@ import * as React from "react"
 /**
  * Component Specific CSS Import
  */
-import "./StatusType.scss"
+// import "./StatusType.scss"
 
 /**
  * React-Redux Method Import.
