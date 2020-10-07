@@ -251,7 +251,7 @@ class InProgressTickets extends React.Component<
                               assignedTo: x.AssignedTo.Title,
                               createdBy: x.Author.Title,
                               dueDate: dayjs(x.TicketDueDate).format(
-                                  "YYYY-MM-DD HH:mm:ss"
+                                  "MM-DD-YYYY"
                               ),
                               ticketStatus: x.StatusId.StatusTypeName,
                               actions: x.Id,

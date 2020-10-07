@@ -50,6 +50,7 @@ type IStatusTypeState = {
     rowData: Array<StatusTypeCols>
     columns: Array<any>
     statusTypeSearch: string
+    isLoading: boolean
 }
 
 /**
@@ -91,6 +92,7 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
         ],
         rowData: [],
         statusTypeSearch: "",
+        isLoading: false,
     }
 
     /**
@@ -105,12 +107,12 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
      * Render() Method
      */
     public render(): React.ReactElement {
-        const { columns, rowData, statusTypeSearch } = this.state
+        const { columns, rowData, statusTypeSearch, isLoading } = this.state
         return (
             <>
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
-                <Spin>
+                <Spin spinning={isLoading}>
                     <Layout
                         style={{
                             backgroundColor: "white",
@@ -180,35 +182,37 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
      * This Method Fetch All The Data Of Status Types For DataTable
      */
     private fetchStatusTypeItems = async () => {
-        try {
-            const { absUrl, httpClient } = this.props
-            let customfilter = this.customSearch()
-            const params = readItemsParams({
-                absoluteUrl: absUrl,
-                listTitle: listTitles.STATUS_TYPE,
-                filters: `${customfilter}`,
-            })
-            const response = await httpClient.get(
-                params.url,
-                params.config,
-                params.options
-            )
-            const result = await response.json()
-            const _data: Array<StatusTypeCols> = result.value.length
-                ? result.value.map(
-                      (x: any, ind: number) =>
-                          ({
-                              sr: ind + 1,
-                              statusTypeName: x.StatusTypeName,
-                              isActive: x.IsActive ? "Yes" : "No",
-                              actions: x.Id,
-                          } as StatusTypeCols)
-                  )
-                : []
-            this.setState({ rowData: _data })
-        } catch (error) {
-            console.error("Error while Fetch All Status Type", error)
-        }
+        const { absUrl, httpClient } = this.props
+        this.setState({ isLoading: true }, async () => {
+            try {
+                let customfilter = this.customSearch()
+                const params = readItemsParams({
+                    absoluteUrl: absUrl,
+                    listTitle: listTitles.STATUS_TYPE,
+                    filters: `${customfilter}`,
+                })
+                const response = await httpClient.get(
+                    params.url,
+                    params.config,
+                    params.options
+                )
+                const result = await response.json()
+                const _data: Array<StatusTypeCols> = result.value.length
+                    ? result.value.map(
+                          (x: any, ind: number) =>
+                              ({
+                                  sr: ind + 1,
+                                  statusTypeName: x.StatusTypeName,
+                                  isActive: x.IsActive ? "Yes" : "No",
+                                  actions: x.Id,
+                              } as StatusTypeCols)
+                      )
+                    : []
+                this.setState({ rowData: _data, isLoading: false })
+            } catch (error) {
+                console.error("Error while Fetch All Status Type", error)
+            }
+        })
     }
 
     /**

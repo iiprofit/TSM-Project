@@ -226,7 +226,6 @@ class ClossedTickets extends React.Component<
                     listTitle: listTitles.TICKET_INFORMATION_TABLE,
                     filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
                 })
-
                 const response = await httpClient.get(
                     params.url,
                     params.config,
@@ -246,10 +245,10 @@ class ClossedTickets extends React.Component<
                                   assignedTo: x.AssignedTo.Title,
                                   createdBy: x.Author.Title,
                                   dueDate: dayjs(x.TicketDueDate).format(
-                                      "YYYY-MM-DD HH:mm:ss"
+                                      "MM-DD-YYYY"
                                   ),
                                   ticketStatus: x.StatusId.StatusTypeName,
-                                  actions: x.ChecklistTransaction.Id,
+                                  actions: x.Id,
                               } as TicketCols)
                       )
                     : []
@@ -270,7 +269,7 @@ class ClossedTickets extends React.Component<
             let filterVariable: string = `&$filter=StatusIdId eq 2`
 
             if (searchTicket) {
-                filterVariable = `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
+                filterVariable += `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
             } else {
                 filterVariable = `&$filter=StatusIdId eq 2`
             }

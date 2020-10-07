@@ -53,6 +53,7 @@ type IUsersState = {
     columns: Array<any>
     rowData: Array<UserCols>
     userSearch: string
+    isLoading: boolean
 }
 
 /**
@@ -89,6 +90,7 @@ class Users extends React.Component<IUsersProp, IUsersState> {
         ],
         rowData: [],
         userSearch: "",
+        isLoading: false,
     }
 
     /**
@@ -103,12 +105,12 @@ class Users extends React.Component<IUsersProp, IUsersState> {
      * Render() Method
      */
     public render(): React.ReactElement<IUsersProp> {
-        const { columns, rowData, userSearch } = this.state
+        const { columns, rowData, userSearch, isLoading } = this.state
         return (
             <>
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
-                <Spin>
+                <Spin spinning={isLoading}>
                     <Layout
                         style={{
                             backgroundColor: "white",
@@ -177,41 +179,43 @@ class Users extends React.Component<IUsersProp, IUsersState> {
      * This Method Fetch All The Data Of Users For DataTable
      */
     private fetchUsers = async () => {
-        try {
-            const { httpClient, absUrl } = this.props
-            let customfilter = this.customSearch()
-            const param = readItemsParams({
-                absoluteUrl: absUrl,
-                listTitle: listTitles.USER_ROLE_TABLE,
-                filters: `$select=*,Email/EMail&$expand=Email/EMail${customfilter}`,
-            })
-            httpClient
-                .get(param.url, param.config, param.options)
-                .then((response) => response.json())
-                .then((result) => {
-                    const _data = result.value
-                    let _users: Array<UserCols>
-                    _users = _data.length
-                        ? _data.map((x, ind) => {
-                              let rights = rightsToBoolean(x.Rights)
-                              return {
-                                  sr: ind + 1,
-                                  userName: x.FirstName,
-                                  actions: x.Id,
-                                  email: x.Email.EMail,
-                                  admin: rights.admin ? "Yes" : "No",
-                                  requester: rights.approve ? "Yes" : "No",
-                                  isActive: x.IsActive ? "Yes" : "No",
-                              } as UserCols
-                          })
-                        : []
-                    this.setState({ rowData: _users })
+        const { httpClient, absUrl } = this.props
+        this.setState({ isLoading: true }, async () => {
+            try {
+                let customfilter = this.customSearch()
+                const param = readItemsParams({
+                    absoluteUrl: absUrl,
+                    listTitle: listTitles.USER_ROLE_TABLE,
+                    filters: `$select=*,Email/EMail&$expand=Email/EMail${customfilter}`,
                 })
-                .then(() => {})
-                .catch((err) => console.error(err))
-        } catch (error) {
-            console.error(error)
-        }
+                httpClient
+                    .get(param.url, param.config, param.options)
+                    .then((response) => response.json())
+                    .then((result) => {
+                        const _data = result.value
+                        let _users: Array<UserCols>
+                        _users = _data.length
+                            ? _data.map((x, ind) => {
+                                  let rights = rightsToBoolean(x.Rights)
+                                  return {
+                                      sr: ind + 1,
+                                      userName: x.FirstName,
+                                      actions: x.Id,
+                                      email: x.Email.EMail,
+                                      admin: rights.admin ? "Yes" : "No",
+                                      requester: rights.approve ? "Yes" : "No",
+                                      isActive: x.IsActive ? "Yes" : "No",
+                                  } as UserCols
+                              })
+                            : []
+                        this.setState({ rowData: _users, isLoading: false })
+                    })
+                    .then(() => {})
+                    .catch((err) => console.error(err))
+            } catch (error) {
+                console.error(error)
+            }
+        })
     }
 
     /**

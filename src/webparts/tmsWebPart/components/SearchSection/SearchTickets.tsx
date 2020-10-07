@@ -90,8 +90,8 @@ type ISearchTicketsState = {
     srchStatusType?: Array<any>
     srchStatusTypeSelected?: number
     srchPriority?: Array<any>
-    srchPrioritySelected?: Array<any>
-    srchAssignedToSelected?: Array<any>
+    srchPrioritySelected?: string
+    srchAssignedToSelected?: number
     srchAssignedTo?: Array<any>
     srchCustomer?: Array<any>
     srchCustomerSelected?: Array<any>
@@ -149,6 +149,11 @@ class SearchTickets extends React.Component<
                 dataIndex: "dueDate",
                 key: "dueDate",
             },
+            {
+                title: "Created Date",
+                dataIndex: "createdDate",
+                key: "createdDate",
+            },
             ,
             {
                 title: "Ticket Status",
@@ -160,7 +165,7 @@ class SearchTickets extends React.Component<
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    ;<Button
+                    <Button
                         shape="circle"
                         type="link"
                         /*@ts-ignore*/
@@ -182,9 +187,9 @@ class SearchTickets extends React.Component<
             { value: "Low", text: "Low" },
             { value: "None", text: "None" },
         ],
-        srchPrioritySelected: [],
+        srchPrioritySelected: "",
         srchStatusTypeSelected: null,
-        srchAssignedToSelected: [],
+        srchAssignedToSelected: null,
         srchCustomerSelected: [],
         srchStatusType: [],
         allUserData: [],
@@ -202,8 +207,8 @@ class SearchTickets extends React.Component<
      * @onFetchCustomer This Method Fetch All Customers
      */
     public componentDidMount() {
-        this.setState({ isLoading: true })
         this.fetchSearchResult()
+        this.setState({ isLoading: true })
         this.onSearchParamsFetch().then(() => {
             this.onRequestereFetch()
             this.onFetchTypes()
@@ -286,12 +291,14 @@ class SearchTickets extends React.Component<
                                             showSearch
                                             style={{ width: 200 }}
                                             value={srchStatusTypeSelected}
+                                            placeholder="Ticket Status Type"
                                             optionFilterProp="children"
-                                            onChange={(value) =>
+                                            onChange={(value) => {
+                                                console.log(value)
                                                 this.setState({
                                                     srchStatusTypeSelected: value,
                                                 })
-                                            }
+                                            }}
                                         >
                                             {srchStatusType &&
                                                 srchStatusType.map((items) => (
@@ -310,14 +317,14 @@ class SearchTickets extends React.Component<
                                         <Select
                                             showSearch
                                             style={{ width: 200 }}
-                                            placeholder="Select Priority"
+                                            placeholder="Ticket Priority"
                                             value={srchPrioritySelected}
                                             optionFilterProp="children"
-                                            onChange={(value) =>
+                                            onChange={(value) => {
                                                 this.setState({
                                                     srchPrioritySelected: value,
                                                 })
-                                            }
+                                            }}
                                         >
                                             {srchPriority &&
                                                 srchPriority.map((items) => (
@@ -336,13 +343,15 @@ class SearchTickets extends React.Component<
                                         <Select
                                             showSearch
                                             style={{ width: 200 }}
+                                            placeholder="Person Name"
                                             value={srchAssignedToSelected}
                                             optionFilterProp="children"
-                                            onChange={(value) =>
+                                            onChange={(value) => {
+                                                console.log(value)
                                                 this.setState({
                                                     srchAssignedToSelected: value,
                                                 })
-                                            }
+                                            }}
                                         >
                                             {srchAssignedTo &&
                                                 srchAssignedTo.map((items) => (
@@ -363,8 +372,8 @@ class SearchTickets extends React.Component<
                                             style={{ width: 200 }}
                                             value={srchCustomerSelected}
                                             optionFilterProp="children"
+                                            placeholder="Customer Name"
                                             onChange={(value) => {
-                                                // console.log(value);
                                                 this.setState({
                                                     srchCustomerSelected: value,
                                                 })
@@ -448,6 +457,10 @@ class SearchTickets extends React.Component<
             this.setState({
                 srchStatusTypeSelected: null,
                 srchCustomerSelected: [],
+                srchAssignedToSelected: null,
+                srchPrioritySelected: null,
+                startDate: null,
+                endDate: null,
             })
         } catch (error) {
             console.error(error)
@@ -576,6 +589,7 @@ class SearchTickets extends React.Component<
             // console.log(this.state.srchCustomerSelected);
             const { absUrl, httpClient } = this.props
             let filterVariable: string
+            console.log("i am in custom search")
 
             let {
                 invaliddate,
@@ -587,13 +601,17 @@ class SearchTickets extends React.Component<
                 srchStatusTypeSelected,
             } = this.state
             // console.log(srchStatusTypeSelected);
-            let tempstartdate = startDate.format("YYYY-MM-DD").toString()
-            let tempenddate = endDate.format("YYYY-MM-DD").toString()
+            let tempstartdate = startDate
+                ? startDate.format("YYYY-MM-DD").toString()
+                : null
+            let tempenddate = endDate
+                ? endDate.format("YYYY-MM-DD").toString()
+                : null
 
             if (
-                srchAssignedToSelected.length ||
+                srchAssignedToSelected ||
                 srchCustomerSelected.length ||
-                srchPrioritySelected.length ||
+                srchPrioritySelected ||
                 srchStatusTypeSelected ||
                 !invaliddate
             ) {
@@ -603,37 +621,34 @@ class SearchTickets extends React.Component<
             }
 
             if (filterVariable) {
-                if (srchAssignedToSelected.length) {
+                if (srchAssignedToSelected) {
                     filterVariable === "&$filter="
-                        ? (filterVariable += `(AssignedToId eq '${srchAssignedToSelected[0].value}')`)
-                        : (filterVariable += ` and (AssignedToId eq '${srchAssignedToSelected[0].value}')`)
+                        ? (filterVariable += `(AssignedToId eq '${srchAssignedToSelected}')`)
+                        : (filterVariable += ` and (AssignedToId eq '${srchAssignedToSelected}')`)
                 }
                 if (srchCustomerSelected.length) {
                     filterVariable === "&$filter="
                         ? (filterVariable += `(CustomerDetails/CustomerName eq '${srchCustomerSelected}')`)
                         : (filterVariable += ` and (CustomerDetails/CustomerName eq '${srchCustomerSelected}')`)
                 }
-                if (srchPrioritySelected.length) {
+                if (srchPrioritySelected) {
                     filterVariable === "&$filter="
-                        ? (filterVariable += `(TicketPriority eq '${srchPrioritySelected[0].value}')`)
-                        : (filterVariable += ` and (TicketPriority eq '${srchPrioritySelected[0].value}')`)
+                        ? (filterVariable += `(TicketPriority eq '${srchPrioritySelected}')`)
+                        : (filterVariable += ` and (TicketPriority eq '${srchPrioritySelected}')`)
                 }
                 if (srchStatusTypeSelected) {
                     filterVariable === "&$filter="
                         ? (filterVariable += `(StatusId eq '${srchStatusTypeSelected}')`)
                         : (filterVariable += ` and (StatusId eq '${srchStatusTypeSelected}')`)
                 }
-                if (
-                    tempstartdate !== "Invalid Date" &&
-                    tempenddate !== "Invalid Date"
-                ) {
+                if (tempstartdate !== null && tempenddate !== null) {
                     filterVariable === "&$filter="
                         ? (filterVariable += `(Created ge '${tempstartdate}' and Created le '${tempenddate}')`)
                         : (filterVariable += ` and (Created ge '${tempstartdate}' and Created le '${tempenddate}')`)
                 }
             }
 
-            // console.log(filterVariable);
+            console.log(filterVariable)
             return filterVariable
         } catch (error) {
             console.error("Error while customSearch", error)
@@ -644,65 +659,75 @@ class SearchTickets extends React.Component<
      * This Method Fetch All Ticket From Custom List and Also Perfom Custom Search Operation Using Custom Search Method.
      */
     private fetchSearchResult = async () => {
-        try {
-            const { absUrl, httpClient } = this.props
-            let customfilter = this.customSearch()
-            const params = readItemsParams({
-                absoluteUrl: absUrl,
-                listTitle: listTitles.TICKET_INFORMATION_TABLE,
-                filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
-                // filters: `$select=*,ChecklistTransaction/Id,ChecklistTransaction/ProductName,ChecklistTransaction/ReleaseName,ChecklistTransaction/JiraTicketNo,Author/Title,Editor/Title,ApprovedBy/Title&$expand=ChecklistTransaction,Author,Editor,ApprovedBy${this.customSearch()}&$orderby=Modified desc`
-            })
-            // console.log(params);
-            const response = await httpClient.get(
-                params.url,
-                params.config,
-                params.options
-            )
-            const result = await response.json()
-            // console.log(result);
-            let downloadResult = result.value.length
-                ? result.value.map((x: any, ind: number) => ({
-                      SR: ind + 1,
-                      TicketNo: x.TicketNo,
-                      TicketTitle: x.Title,
-                      CustomerName: x.CustomerDetails.CustomerName,
-                      ProductName: x.ProductId.ProductName,
-                      Priority: x.TicketPriority,
-                      AssignedTo: x.AssignedTo.Title,
-                      CreatedBy: x.Author.Title,
-                      DueDate: dayjs(x.TicketDueDate).format(
-                          "YYYY-MM-DD HH:mm:ss"
-                      ),
-                      TicketStatus: x.StatusId.StatusTypeName,
-                  }))
-                : ""
-            this.setState({ downloadData: downloadResult })
-            const _data: Array<TicketCols> = result.value.length
-                ? result.value.map(
-                      (x: any, ind: number) =>
-                          ({
-                              sr: ind + 1,
-                              ticketNo: x.TicketNo,
-                              ticketTitle: x.Title,
-                              customerName: x.CustomerDetails.CustomerName,
-                              productName: x.ProductId.ProductName,
-                              priority: x.TicketPriority,
-                              assignedTo: x.AssignedTo.Title,
-                              createdBy: x.Author.Title,
-                              dueDate: dayjs(x.TicketDueDate).format(
-                                  "YYYY-MM-DD HH:mm:ss"
-                              ),
-                              ticketStatus: x.StatusId.StatusTypeName,
-                              actions: x.Id,
-                          } as TicketCols)
-                  )
-                : []
-            // console.log(_data);
-            this.setState({ rowData: _data })
-        } catch (error) {
-            console.error("Error while fetch Search Result", error)
-        }
+        const { absUrl, httpClient } = this.props
+        let { isLoading } = this.state
+        this.setState({ isLoading: true }, async () => {
+            try {
+                let customfilter = this.customSearch()
+                console.log(customfilter)
+                const params = readItemsParams({
+                    absoluteUrl: absUrl,
+                    listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                    filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
+                    // filters: `$select=*,ChecklistTransaction/Id,ChecklistTransaction/ProductName,ChecklistTransaction/ReleaseName,ChecklistTransaction/JiraTicketNo,Author/Title,Editor/Title,ApprovedBy/Title&$expand=ChecklistTransaction,Author,Editor,ApprovedBy${this.customSearch()}&$orderby=Modified desc`
+                })
+                console.log(params)
+                const response = await httpClient.get(
+                    params.url,
+                    params.config,
+                    params.options
+                )
+                const result = await response.json()
+                console.log(result)
+                let downloadResult = result.value.length
+                    ? result.value.map((x: any, ind: number) => ({
+                          SR: ind + 1,
+                          TicketNo: x.TicketNo,
+                          TicketTitle: x.Title,
+                          CustomerName: x.CustomerDetails.CustomerName,
+                          ProductName: x.ProductId.ProductName,
+                          Priority: x.TicketPriority,
+                          AssignedTo: x.AssignedTo.Title,
+                          CreatedBy: x.Author.Title,
+                          DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
+                          createdDate: dayjs(x.Created).format(
+                              "MM-DD-YYYY"
+                          ),
+                          TicketStatus: x.StatusId.StatusTypeName,
+                      }))
+                    : ""
+
+                console.log(downloadResult)
+                this.setState({ downloadData: downloadResult })
+                const _data: Array<TicketCols> = result.value.length
+                    ? result.value.map(
+                          (x: any, ind: number) =>
+                              ({
+                                  sr: ind + 1,
+                                  ticketNo: x.TicketNo,
+                                  ticketTitle: x.Title,
+                                  customerName: x.CustomerDetails.CustomerName,
+                                  productName: x.ProductId.ProductName,
+                                  priority: x.TicketPriority,
+                                  assignedTo: x.AssignedTo.Title,
+                                  createdBy: x.Author.Title,
+                                  dueDate: dayjs(x.TicketDueDate).format(
+                                      "MM-DD-YYYY"
+                                  ),
+                                  createdDate: dayjs(x.Created).format(
+                                      "MM-DD-YYYY"
+                                  ),
+                                  ticketStatus: x.StatusId.StatusTypeName,
+                                  actions: x.Id,
+                              } as TicketCols)
+                      )
+                    : []
+                // console.log(_data);
+                this.setState({ rowData: _data, isLoading: false })
+            } catch (error) {
+                console.error("Error while fetch Search Result", error)
+            }
+        })
     }
 
     /**
@@ -717,16 +742,18 @@ class SearchTickets extends React.Component<
             var sheet = workbook.addWorksheet("Export Data")
 
             let columns = [
-                { header: "Ticket No", key: "ProductName", width: 26 },
-                { header: "Ticket Title", key: "ReleaseName", width: 26 },
-                { header: "Customer Name", key: "ReleaseType", width: 26 },
-                { header: "Priority", key: "JiraTicketNo", width: 26 },
-                { header: "Assigned To", key: "SubmittedBy", width: 26 },
-                { header: "Created By", key: "ApprovedAt", width: 26 },
-                { header: "Due Date", key: "TransactionID", width: 26 },
+                { header: "Sr", key: "SR", width: 5 },
+                { header: "Ticket No", key: "TicketNo", width: 26 },
+                { header: "Ticket Title", key: "TicketTitle", width: 26 },
+                { header: "Customer Name", key: "CustomerName", width: 26 },
+                { header: "Product Name", key: "ProductName", width: 26 },
+                { header: "Priority", key: "Priority", width: 26 },
+                { header: "Assigned To", key: "AssignedTo", width: 26 },
+                { header: "Created By", key: "CreatedBy", width: 26 },
+                { header: "Due Date", key: "DueDate", width: 26 },
                 {
                     header: "Ticket Status",
-                    key: "TransactionStatus",
+                    key: "TicketStatus",
                     width: 26,
                 },
             ]

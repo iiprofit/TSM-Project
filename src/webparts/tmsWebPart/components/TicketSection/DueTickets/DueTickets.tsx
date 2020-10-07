@@ -59,8 +59,9 @@ type TicketCols = {
 type IDueTicketsState = {
     rowData: Array<TicketCols>
     columns: Array<any>
-    currentdate: Date
+    currentdate: any
     searchTicket: string
+    isLoading: boolean
 }
 
 /**
@@ -139,8 +140,9 @@ class DueTodaysTickets extends React.Component<
             } as any,
         ],
         rowData: [],
-        currentdate: new Date(),
+        currentdate: dayjs().format("YYYY-MM-DD").toString(),
         searchTicket: "",
+        isLoading: false,
     }
 
     /**
@@ -155,10 +157,10 @@ class DueTodaysTickets extends React.Component<
      * Render() Method
      */
     public render(): React.ReactElement {
-        const { columns, rowData, searchTicket } = this.state
+        const { columns, rowData, searchTicket, isLoading } = this.state
         return (
             <>
-                <Spin>
+                <Spin spinning={isLoading}>
                     <Layout
                         style={{
                             backgroundColor: "white",
@@ -217,46 +219,48 @@ class DueTodaysTickets extends React.Component<
     }
 
     private fetchDueTickets = async () => {
-        try {
-            let { currentdate } = this.state
-            let customfilter = this.customSearch()
-            const { absUrl, httpClient } = this.props
-            const params = readItemsParams({
-                absoluteUrl: absUrl,
-                listTitle: listTitles.TICKET_INFORMATION_TABLE,
-                filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId&$filter=TicketDueDate gt '${currentdate}'${customfilter} &$orderby=Modified desc`,
-            })
-
-            const response = await httpClient.get(
-                params.url,
-                params.config,
-                params.options
-            )
-            const result = await response.json()
-            const _data: Array<TicketCols> = result.value.length
-                ? result.value.map(
-                      (x: any, ind: number) =>
-                          ({
-                              sr: ind + 1,
-                              ticketNo: x.TicketNo,
-                              ticketTitle: x.Title,
-                              customerName: x.CustomerDetails.CustomerName,
-                              productName: x.ProductId.ProductName,
-                              priority: x.TicketPriority,
-                              assignedTo: x.AssignedTo.Title,
-                              createdBy: x.Author.Title,
-                              dueDate: dayjs(x.TicketDueDate).format(
-                                  "YYYY-MM-DD HH:mm:ss"
-                              ),
-                              ticketStatus: x.StatusId.StatusTypeName,
-                              actions: x.ChecklistTransaction.Id,
-                          } as TicketCols)
-                  )
-                : []
-            this.setState({ rowData: _data })
-        } catch (error) {
-            console.error("Error while fetch Due Tickets", error)
-        }
+        let { currentdate, isLoading } = this.state
+        this.setState({ isLoading: true }, async () => {
+            try {
+                let customfilter = this.customSearch()
+                const { absUrl, httpClient } = this.props
+                const params = readItemsParams({
+                    absoluteUrl: absUrl,
+                    listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                    filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId&$filter=TicketDueDate lt '${currentdate}' and StatusIdId ne 2 ${customfilter} &$orderby=Modified desc`,
+                })
+                console.log(params)
+                const response = await httpClient.get(
+                    params.url,
+                    params.config,
+                    params.options
+                )
+                const result = await response.json()
+                const _data: Array<TicketCols> = result.value.length
+                    ? result.value.map(
+                          (x: any, ind: number) =>
+                              ({
+                                  sr: ind + 1,
+                                  ticketNo: x.TicketNo,
+                                  ticketTitle: x.Title,
+                                  customerName: x.CustomerDetails.CustomerName,
+                                  productName: x.ProductId.ProductName,
+                                  priority: x.TicketPriority,
+                                  assignedTo: x.AssignedTo.Title,
+                                  createdBy: x.Author.Title,
+                                  dueDate: dayjs(x.TicketDueDate).format(
+                                      "MM-DD-YYYY"
+                                  ),
+                                  ticketStatus: x.StatusId.StatusTypeName,
+                                  actions: x.Id,
+                              } as TicketCols)
+                      )
+                    : []
+                this.setState({ rowData: _data, isLoading: false })
+            } catch (error) {
+                console.error("Error while fetch Due Tickets", error)
+            }
+        })
     }
 
     /**
@@ -269,7 +273,7 @@ class DueTodaysTickets extends React.Component<
             let filterVariable: string = ``
 
             if (searchTicket) {
-                filterVariable = `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
+                filterVariable += `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
             } else {
                 filterVariable = ``
             }

@@ -50,6 +50,7 @@ type IProductState = {
     rowData: Array<ProductCols>
     columns: Array<any>
     productSearch: string
+    isLoading: boolean
 }
 
 /**
@@ -91,6 +92,7 @@ class Product extends React.Component<IProductProp, IProductState> {
         ],
         rowData: [],
         productSearch: "",
+        isLoading: false,
     }
 
     /**
@@ -105,10 +107,10 @@ class Product extends React.Component<IProductProp, IProductState> {
      * Render() Method
      */
     public render(): React.ReactElement {
-        const { columns, rowData, productSearch } = this.state
+        const { columns, rowData, productSearch, isLoading } = this.state
         return (
             <>
-                <Spin>
+                <Spin spinning={isLoading}>
                     <Layout
                         style={{
                             backgroundColor: "white",
@@ -178,8 +180,8 @@ class Product extends React.Component<IProductProp, IProductState> {
      * This Method Fetch All The Data Of Products For DataTable
      */
     private fetchProducts = async () => {
-        try {
-            const { absUrl, httpClient } = this.props
+        const { absUrl, httpClient } = this.props
+        this.setState({ isLoading: true }, async () => {
             let customfilter = this.customSearch()
             const params = readItemsParams({
                 absoluteUrl: absUrl,
@@ -203,10 +205,8 @@ class Product extends React.Component<IProductProp, IProductState> {
                           } as ProductCols)
                   )
                 : []
-            this.setState({ rowData: _data })
-        } catch (error) {
-            console.error("Error while Fetch All Proudcts", error)
-        }
+            this.setState({ rowData: _data, isLoading: false })
+        })
     }
 
     /**

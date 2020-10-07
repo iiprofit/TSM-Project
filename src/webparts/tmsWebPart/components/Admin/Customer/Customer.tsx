@@ -50,6 +50,7 @@ type ICustomerState = {
     rowData: Array<CustomerCols>
     columns: Array<any>
     customerSearch: string
+    isLoading: boolean
 }
 
 /**
@@ -61,7 +62,7 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
      */
     public state: ICustomerState = {
         columns: [
-            { title: "Sr#", data: "sr", key: "sr" },
+            { title: "Sr#", dataIndex: "sr", key: "sr" },
             {
                 title: "Customer Name",
                 dataIndex: "customerName",
@@ -87,18 +88,21 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    ;<Button
-                        shape="circle"
-                        type="link"
-                        /*@ts-ignore*/
-                        icon={<EditOutlined />}
-                        onClick={() => console.log(record)}
-                    />
+                    <Space size="middle">
+                        <Button
+                            shape="circle"
+                            type="link"
+                            /*@ts-ignore*/
+                            icon={<EditOutlined />}
+                            onClick={() => console.log(record)}
+                        />
+                    </Space>
                 },
             } as any,
         ],
         rowData: [],
         customerSearch: "",
+        isLoading: false,
     }
 
     /**
@@ -113,12 +117,12 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
      * Render() Method
      */
     public render(): React.ReactElement {
-        const { columns, rowData, customerSearch } = this.state
+        const { columns, rowData, customerSearch, isLoading } = this.state
         return (
             <>
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
-                <Spin>
+                <Spin spinning={isLoading}>
                     <Layout
                         style={{
                             backgroundColor: "white",
@@ -188,37 +192,41 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
      * This Method Fetch All The Data Of Customers For DataTable
      */
     private fetchCustomers = async () => {
-        try {
-            const { absUrl, httpClient } = this.props
-            let customfilter = this.customSearch()
-            const params = readItemsParams({
-                absoluteUrl: absUrl,
-                listTitle: listTitles.CUSTOMER_INFORMATION,
-                filters: `$select=*,Email/EMail&$expand=Email/EMail${customfilter}`,
-            })
-            const response = await httpClient.get(
-                params.url,
-                params.config,
-                params.options
-            )
-            const result = await response.json()
-            const _data: Array<CustomerCols> = result.value.length
-                ? result.value.map(
-                      (x: any, ind: number) =>
-                          ({
-                              sr: ind + 1,
-                              customerName: x.CustomerName,
-                              customerEmail: x.CustomerEmail,
-                              customerCity: x.CustomerCity,
-                              isActive: x.IsActive ? "Yes" : "No",
-                              actions: x.Id,
-                          } as CustomerCols)
-                  )
-                : []
-            this.setState({ rowData: _data })
-        } catch (error) {
-            console.error("Error while Fetch All Customer Details", error)
-        }
+        const { absUrl, httpClient } = this.props
+        this.setState({ isLoading: true }, async () => {
+            try {
+                let customfilter = this.customSearch()
+                const params = readItemsParams({
+                    absoluteUrl: absUrl,
+                    listTitle: listTitles.CUSTOMER_INFORMATION,
+                    filters: `${customfilter}`,
+                })
+                console.log(params)
+                const response = await httpClient.get(
+                    params.url,
+                    params.config,
+                    params.options
+                )
+                const result = await response.json()
+                console.log(result)
+                const _data: Array<CustomerCols> = result.value.length
+                    ? result.value.map(
+                          (x: any, ind: number) =>
+                              ({
+                                  sr: ind + 1,
+                                  customerName: x.CustomerName,
+                                  customerEmail: x.CustomerEmail,
+                                  customerCity: x.CustomerCity,
+                                  isActive: x.IsActive ? "Yes" : "No",
+                                  actions: x.Id,
+                              } as CustomerCols)
+                      )
+                    : []
+                this.setState({ rowData: _data, isLoading: false })
+            } catch (error) {
+                console.error("Error while Fetch All Customer Details", error)
+            }
+        })
     }
 
     /**
@@ -229,11 +237,7 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
             let { customerSearch } = this.state
             let filterVariable: string = ""
             if (customerSearch) {
-                filterVariable =
-                    "&$filter=StatusTypeName eq" +
-                    customerSearch +
-                    "or Email/EMail eq" +
-                    customerSearch
+                filterVariable = "$filter=CustomerName eq" + customerSearch
             } else {
                 filterVariable = ""
             }
