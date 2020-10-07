@@ -174,7 +174,7 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
                                         loading={isButtonLoading}
                                         onClick={this.handleSubmit}
                                     >
-                                        Submit
+                                        Save
                                     </Button>
                                 </Col>
                                 <Col span={3} offset={10}>
@@ -221,24 +221,6 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
     }
 
     /**
-     * This Method Close Confirmation Dialog Box
-     * !We Need to delete this code
-     */
-    // closeConfirmationDialog = () => {
-    //   this.setState({ showConfirmation: false });
-    // };
-
-    /**
-     * This Method Close Save Confirmation Dialog Box
-     * Redirect The User To Product Tab.
-     * !We Need to delete this code
-     */
-    // closeSaveConfirmDialog = () => {
-    //   this.setState({ saveConfirm: false });
-    //   this.props.history.push("/admin/product-information");
-    // };
-
-    /**
      * This Method Save Data Into Custom List
      */
     saveProduct = async () => {
@@ -248,9 +230,9 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
             absoluteUrl: absUrl,
             listTitle: listTitles.PRODUCT_INFORMATION,
             body: {
-                __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                __metadata: { type: "SP.Data.ProductInformationListItem" },
                 ProductName: productName,
-                IsActive: isActive,
+                isActive: isActive,
                 uuid: uuid.v4(),
             },
         })
@@ -262,31 +244,25 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
                 options
             )
             const result = await response.json()
-            if (result.status == 200) {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.success("Data Inserted Successfully")
-                })
-            } else {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.error("Something Is Wrong!!! Try Again Latter")
-                })
-            }
+
+            result.Id
+                ? this.setState(
+                      {
+                          isButtonLoading: false,
+                          productName: null,
+                      },
+                      () => {
+                          message.success("Data Inserted Successfully")
+                      }
+                  )
+                : this.setState({ isButtonLoading: false }, () => {
+                      message.error("Something Is Wrong!!! Try Again Latter")
+                  })
             return true
         } catch (error) {
             console.error(error)
         }
     }
-
-    /**
-     * This Method Is Used To Take Final Save Confirmation
-     * !We Need to delete this code
-     */
-    // onSaveConfirm = () => {
-    //   this.saveProduct().then(() => {
-    //     this.closeConfirmationDialog();
-    //     this.setState({ saveConfirm: true });
-    //   });
-    // };
 }
 
 /**

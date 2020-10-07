@@ -163,7 +163,7 @@ class IEditStatusType extends React.Component<
                                         loading={isButtonLoading}
                                         onClick={this.handleSubmit}
                                     >
-                                        Submit
+                                        Update
                                     </Button>
                                 </Col>
                                 <Col span={3} offset={10}>
@@ -207,7 +207,7 @@ class IEditStatusType extends React.Component<
             const _item = result
             this.setState({
                 statusTypeName: _item.StatusTypeName,
-                isActive: _item.IsActive,
+                isActive: _item.isActive,
             })
         } catch (error) {
             console.error(error)
@@ -251,15 +251,25 @@ class IEditStatusType extends React.Component<
                 absoluteUrl: absUrl,
                 listTitle: listTitles.STATUS_TYPE,
                 body: {
-                    __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                    __metadata: { type: "SP.Data.StatusTypeListItem" },
                     StatusTypeName: statusTypeName,
-                    IsActive: isActive,
+                    isActive: isActive,
                 },
                 etag: etag,
                 itemId: parseInt(match.params.id),
             })
             const response = await httpClient.post(url, config, options)
-            return true
+            let result = response
+
+            if (result.status == 204) {
+                this.setState({ isButtonLoading: false }, () => {
+                    message.success("Data Update Successfully")
+                })
+            } else {
+                this.setState({ isButtonLoading: false }, () => {
+                    message.error("Something Is Wrong!!! Try Again Latter")
+                })
+            }
         } catch (error) {
             console.error("Error while update status-type " + error)
         }

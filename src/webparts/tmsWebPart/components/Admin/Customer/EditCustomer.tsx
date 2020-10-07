@@ -24,7 +24,7 @@ import { IEditCustomerProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form } from "antd"
+import { Row, Col, Input, Button, message, Spin, Form, Switch, Radio } from "antd"
 
 /**
  * Ant Design Icons Import
@@ -171,13 +171,34 @@ class IEditCustomer extends React.Component<
                                 value={customerEmail}
                                 onChange={(e) =>
                                     this.setState({
-                                        customerCity: e.target.value,
+                                        customerEmail: e.target.value,
                                     })
                                 }
                                 placeholder="Enter email address"
                             />
                         </Form.Item>
                         {/* Customer Email Address Section End  */}
+
+                        {/* Customer Active Status Section Start  */}
+                        <Form.Item label="Active Status">
+                            {/* <Switch
+                                checked={isActive}
+                                onChange={(value) => {
+                                    console.log(value)
+                                    this.setState({ isActive: value })
+                                }}
+                            /> */}
+                            <Radio.Group
+                                onChange={(e) =>
+                                    this.setState({ isActive: e.target.value })
+                                }
+                                value={isActive}
+                            >
+                                <Radio value={true}>YES</Radio>
+                                <Radio value={false}>No</Radio>
+                            </Radio.Group>
+                        </Form.Item>
+                        {/* Customer Active Status Section End  */}
 
                         {/* Action Button Section Start */}
                         <Form.Item>
@@ -226,15 +247,17 @@ class IEditCustomer extends React.Component<
                 param.options
             )
             const result = await response.json()
+
             this.setState({
                 etag: response.headers.get("ETag"),
             })
             const _item = result
+            console.log(_item)
             this.setState({
                 customerName: _item.CustomerName,
                 customerEmail: _item.CustomerEmail,
                 customerCity: _item.CustomerCity,
-                isActive: _item.IsActive,
+                isActive: _item.isActive,
             })
         } catch (error) {
             console.error(error)
@@ -268,7 +291,13 @@ class IEditCustomer extends React.Component<
      * This Method Redirect Users To Customer Tab
      */
     onCancelClick = () => {
-        this.props.history.push("/admin/customer-information")
+        try {
+            this.props.history.push({
+                pathname: `/admin/customer-information`,
+            })
+        } catch (error) {
+            console.error("Error while Cancel Edit Customer", error)
+        }
     }
 
     /**
@@ -286,21 +315,21 @@ class IEditCustomer extends React.Component<
             const { absUrl, match, httpClient } = this.props
             const { url, config, options } = updateItemParams({
                 absoluteUrl: absUrl,
-                listTitle: listTitles.STATUS_TYPE,
+                listTitle: listTitles.CUSTOMER_INFORMATION,
                 body: {
-                    __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                    __metadata: { type: "SP.Data.CustomerInformationListItem" },
                     CustomerName: customerName,
                     CustomerEmail: customerEmail,
                     CustomerCity: customerCity,
-                    IsActive: isActive,
+                    isActive: isActive,
                 },
                 etag: etag,
                 itemId: parseInt(match.params.id),
             })
             const response = await httpClient.post(url, config, options)
-
-            const result = await response.json()
-            if (result.status == 200) {
+            const result = await response
+            
+            if (result.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("Data Updated Successfully")
                 })
@@ -313,35 +342,6 @@ class IEditCustomer extends React.Component<
             console.error("Error while update Customer " + error)
         }
     }
-
-    /**
-     * This Method Close Confirmation Dialog Box.
-     * ! I Need To Delete This Code
-     */
-    // closeConfirmationDialog = () => {
-    //   this.setState({ showConfirmation: false });
-    // };
-
-    /**
-     * This Method Close Save Confirmation Dialog Box.
-     * Redirect The User To Customer Tab.
-     * ! I Need To Delete This Code
-     */
-    // closeSaveConfirmDialog = () => {
-    //   this.setState({ saveConfirm: false });
-    //   this.props.history.push("/admin/customer-information");
-    // };
-
-    /**
-     * This Method Take Final Confirmation From User And Call Update Customer Method.
-     * ! I Need To Delete This Code
-     */
-    // onUpdateConfirm = () => {
-    //   this.updateCustomer().then(() => {
-    //     this.closeConfirmationDialog();
-    //     this.setState({ saveConfirm: true });
-    //   });
-    // };
 }
 
 /**

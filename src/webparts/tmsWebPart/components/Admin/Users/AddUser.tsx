@@ -443,7 +443,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                 EmailId: selectedUser.value,
                 Rights: this.rightsToString(),
                 uuid: uuid.v4(),
-                IsActive: isActive,
+                isActive: isActive,
             },
         })
 
@@ -455,15 +455,29 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
             )
             const result = await response.json()
 
-            if (result.status == 200) {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.success("User Inserted Successfully")
-                })
-            } else {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.error("Something Is Wrong!!! Try Again Latter")
-                })
-            }
+            result.Id
+                ? this.setState(
+                      {
+                          isButtonLoading: false,
+                        
+                      },
+                      () => {
+                          message.success("User Inserted Successfully")
+                      }
+                  )
+                : this.setState({ isButtonLoading: false }, () => {
+                      message.error("Something Is Wrong!!! Try Again Latter")
+                  })
+
+            // if (result.status == 200) {
+            //     this.setState({ isButtonLoading: false }, () => {
+            //         message.success("User Inserted Successfully")
+            //     })
+            // } else {
+            //     this.setState({ isButtonLoading: false }, () => {
+            //         message.error("Something Is Wrong!!! Try Again Latter")
+            //     })
+            // }
         } catch (error) {
             console.error(error)
         }

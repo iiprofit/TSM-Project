@@ -10,6 +10,12 @@ import * as React from "react"
 import { connect } from "react-redux"
 
 /**
+ * React Router Packge Import.
+ * @Link is used to Re-direct user to another section.
+ */
+import { Link } from "react-router-dom"
+
+/**
  * Current Component Props Import From Global Props Location.
  */
 import { IUsersProp } from "../../../Store/Types"
@@ -75,17 +81,21 @@ class Users extends React.Component<IUsersProp, IUsersState> {
                 title: "Action",
                 dataIndex: "actions",
                 key: "actions",
-                render: (text, record) => (
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
-                ),
+                render: (text, record) => {
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-user/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
+                },
             } as any,
         ],
         rowData: [],
@@ -118,17 +128,19 @@ class Users extends React.Component<IUsersProp, IUsersState> {
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
                             <Row>
-                                {/* Add Customer Button Section Start */}
+                                {/* Add User Button Section Start */}
                                 <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
-                                        Add Customer
-                                    </Button>
+                                    <Link to="/new-user">
+                                        <Button
+                                            type="primary"
+                                            /*@ts-ignore*/
+                                            size="middle"
+                                        >
+                                            Add User
+                                        </Button>
+                                    </Link>
                                 </Col>
-                                {/* Add Customer Button Section End */}
+                                {/* Add User Button Section End */}
 
                                 {/* Search Customer  Section Start */}
                                 <Col span={12}>
@@ -204,7 +216,7 @@ class Users extends React.Component<IUsersProp, IUsersState> {
                                       email: x.Email.EMail,
                                       admin: rights.admin ? "Yes" : "No",
                                       requester: rights.approve ? "Yes" : "No",
-                                      isActive: x.IsActive ? "Yes" : "No",
+                                      isActive: x.isActive ? "Yes" : "No",
                                   } as UserCols
                               })
                             : []

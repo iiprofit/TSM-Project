@@ -41,6 +41,14 @@ import DueTodayTickets from "./TicketSection/DueTodayTicket/DueTodayTickets"
 // import InProgrssTickets from "./InProgressTickets/InProgressTickets";
 import NewTicket from "./TicketSection/NewTicket/NewTicket"
 import EditTicket from "./TicketSection/EditTicket/EditTicket"
+import AddCustomer from "./Admin/Customer/AddCustomer"
+import EditCustomer from "./Admin/Customer/EditCustomer"
+import AddProduct from "./Admin/Product/AddProduct"
+import EditProduct from "./Admin/Product/EditProduct"
+import AddStatusType from "./Admin/StatusType/AddStatusType"
+import EditStatusType from "./Admin/StatusType/EditStatusType"
+import AddUser from "./Admin/Users/AddUser"
+import EditUser from "./Admin/Users/EditUser"
 
 /**
  * Declaring Types Of Compoent States
@@ -129,6 +137,38 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                         {rights.admin && (
                             <TabPane tab="Admin" key="admin">
                                 <Route path="/admin" component={Admin} />
+                                <Route
+                                    path="/new-customer"
+                                    component={AddCustomer}
+                                />
+                                <Route
+                                    path="/edit-customer/:id"
+                                    component={EditCustomer}
+                                />
+                                <Route
+                                    path="/new-product"
+                                    component={AddProduct}
+                                />
+                                <Route
+                                    path="/edit-product/:id"
+                                    component={EditProduct}
+                                />
+                                <Route
+                                    path="/new-status"
+                                    component={AddStatusType}
+                                />
+                                <Route
+                                    path="/edit-status/:id"
+                                    component={EditStatusType}
+                                />
+                                 <Route
+                                    path="/new-user"
+                                    component={AddUser}
+                                />
+                                <Route
+                                    path="/edit-user/:id"
+                                    component={EditUser}
+                                />
                             </TabPane>
                         )}
                     </Tabs>
@@ -175,10 +215,20 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     private updateActivetab = (location: string) => {
         try {
             // console.log({ location });
-            let _admin = ["release", "checklist", "user"]
+            let _admin = [
+                "release",
+                "checklist",
+                "user",
+                "customer",
+                "product",
+                "status",
+            ]
             if (location === "/") {
                 this.props.history.push("/ticketsection/in-progress")
-            } else if (location.includes("/admin")) {
+            } else if (
+                location.includes("/admin") ||
+                _admin.filter((x) => location.includes(x)).length
+            ) {
                 this.setState({ activeTab: "admin" })
             } else if (location.includes("/search-section")) {
                 this.setState({ activeTab: "searchsection" })

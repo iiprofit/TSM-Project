@@ -148,8 +148,8 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
                                 }
                                 value={isActive}
                             >
-                                <Radio value={true}>True</Radio>
-                                <Radio value={false}>False</Radio>
+                                <Radio value={true}>YES</Radio>
+                                <Radio value={false}>No</Radio>
                             </Radio.Group>
                         </Form.Item>
                         {/* Product Status Section End */}
@@ -163,7 +163,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
                                         loading={isButtonLoading}
                                         onClick={this.handleSubmit}
                                     >
-                                        Submit
+                                        Update
                                     </Button>
                                 </Col>
                                 <Col span={3} offset={10}>
@@ -207,7 +207,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
             const _item = result
             this.setState({
                 productName: _item.ProductName,
-                isActive: _item.IsActive,
+                isActive: _item.isActive,
             })
         } catch (error) {
             console.error(error)
@@ -251,16 +251,18 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
                 absoluteUrl: absUrl,
                 listTitle: listTitles.PRODUCT_INFORMATION,
                 body: {
-                    __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                    __metadata: { type: "SP.Data.ProductInformationListItem" },
                     ProductName: productName,
-                    IsActive: isActive,
+                    isActive: isActive,
                 },
                 etag: etag,
                 itemId: parseInt(match.params.id),
             })
             const response = await httpClient.post(url, config, options)
             let result = response
-            if (result.status == 200) {
+
+            console.log(result)
+            if (result.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("Data Update Successfully")
                 })

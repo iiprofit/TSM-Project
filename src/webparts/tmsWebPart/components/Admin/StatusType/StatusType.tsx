@@ -10,6 +10,12 @@ import * as React from "react"
 import { connect } from "react-redux"
 
 /**
+ * React Router Packge Import.
+ * @Link is used to Re-direct user to another section.
+ */
+import { Link } from "react-router-dom"
+
+/**
  * Current Component Props Import From Global Props Location.
  */
 import { IStatusTypeProp } from "../../../Store/Types"
@@ -77,17 +83,21 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
                 title: "Actions",
                 dataIndex: "actions",
                 key: "actions",
-                render: (text, record) => (
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
-                ),
+                render: (text, record) => {
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-status/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
+                },
             } as any,
         ],
         rowData: [],
@@ -122,13 +132,15 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
                             <Row>
                                 {/* Add Status Button Section Start */}
                                 <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
-                                        Add Status Type
-                                    </Button>
+                                    <Link to="/new-status">
+                                        <Button
+                                            type="primary"
+                                            /*@ts-ignore*/
+                                            size="middle"
+                                        >
+                                            Add Status Type
+                                        </Button>
+                                    </Link>
                                 </Col>
                                 {/* Add Status Type Button Section Start */}
 
@@ -203,7 +215,7 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
                               ({
                                   sr: ind + 1,
                                   statusTypeName: x.StatusTypeName,
-                                  isActive: x.IsActive ? "Yes" : "No",
+                                  isActive: x.isActive ? "Yes" : "No",
                                   actions: x.Id,
                               } as StatusTypeCols)
                       )
@@ -241,7 +253,7 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
      */
     private goToEditStatusType = (value) => {
         this.props.history.push({
-            pathname: `/edit-status-type/${value}`,
+            pathname: `/edit-status/${value}`,
             state: {
                 statusId: value,
             },

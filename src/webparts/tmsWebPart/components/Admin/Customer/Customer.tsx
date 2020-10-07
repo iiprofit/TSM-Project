@@ -9,6 +9,12 @@ import * as React from "react"
 import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
 
 /**
+ * React Router Packge Import.
+ * @Link is used to Re-direct user to another section.
+ */
+import { Link } from "react-router-dom"
+
+/**
  * Ant Design Icons Import
  */
 import { EditOutlined } from "@ant-design/icons"
@@ -88,15 +94,19 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-customer/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
                 },
             } as any,
         ],
@@ -132,13 +142,15 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                             <Row>
                                 {/* Add Customer Button Section Start */}
                                 <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
-                                        Add Customer
-                                    </Button>
+                                    <Link to="/new-customer">
+                                        <Button
+                                            type="primary"
+                                            /*@ts-ignore*/
+                                            size="middle"
+                                        >
+                                            Add Customer
+                                        </Button>
+                                    </Link>
                                 </Col>
                                 {/* Add Customer Button Section End */}
 
@@ -217,7 +229,7 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                                   customerName: x.CustomerName,
                                   customerEmail: x.CustomerEmail,
                                   customerCity: x.CustomerCity,
-                                  isActive: x.IsActive ? "Yes" : "No",
+                                  isActive: x.isActive ? "Yes" : "No",
                                   actions: x.Id,
                               } as CustomerCols)
                       )

@@ -128,7 +128,6 @@ class InProgressTickets extends React.Component<
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    console.log(record)
                     return (
                         <Space size="middle">
                             <Link to={`/edit-ticket/${record.actions}`}>

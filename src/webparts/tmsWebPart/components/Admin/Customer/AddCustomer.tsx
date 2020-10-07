@@ -42,7 +42,7 @@ import { IAddCustomerProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form } from "antd"
+import { Row, Col, Input, Button, message, Spin, Form , Radio } from "antd"
 
 /**
  * Ant Design Icons Import
@@ -178,13 +178,34 @@ class AddCustomer extends React.Component<
                                 value={customerEmail}
                                 onChange={(e) =>
                                     this.setState({
-                                        customerCity: e.target.value,
+                                        customerEmail: e.target.value,
                                     })
                                 }
                                 placeholder="Enter email address"
                             />
                         </Form.Item>
                         {/* Customer Email Address Section End  */}
+
+                          {/* Customer Active Status Section Start  */}
+                          <Form.Item label="Active Status">
+                            {/* <Switch
+                                checked={isActive}
+                                onChange={(value) => {
+                                    console.log(value)
+                                    this.setState({ isActive: value })
+                                }}
+                            /> */}
+                            <Radio.Group
+                                onChange={(e) =>
+                                    this.setState({ isActive: e.target.value })
+                                }
+                                value={isActive}
+                            >
+                                <Radio value={true}>YES</Radio>
+                                <Radio value={false}>No</Radio>
+                            </Radio.Group>
+                        </Form.Item>
+                        {/* Customer Active Status Section End  */}
 
                         {/* Action Button Section Start */}
                         <Form.Item>
@@ -195,7 +216,7 @@ class AddCustomer extends React.Component<
                                         loading={isButtonLoading}
                                         onClick={this.handleSubmit}
                                     >
-                                        Submit
+                                        Save
                                     </Button>
                                 </Col>
                                 <Col span={3} offset={10}>
@@ -242,26 +263,14 @@ class AddCustomer extends React.Component<
      * This Method Redirect Users To Customer Tab
      */
     onCancelClick = () => {
-        this.props.history.push("/admin/customer-information")
+        try {
+            this.props.history.push({
+                pathname: `/admin/customer-information/`,
+            })
+        } catch (error) {
+            console.error("Error while Cancel New Customer", error)
+        }
     }
-
-    /**
-     * This Method Close Confirmation Dialog Box
-     * !We Need to delete this code
-     */
-    // closeConfirmationDialog = () => {
-    //   this.setState({ showConfirmation: false });
-    // };
-
-    /**
-     * This Method Close Save Confirmation Dialog Box
-     * Redirect The User To Customer Tab
-     * ! I Need To Delete This Code
-     */
-    // closeSaveConfirmDialog = () => {
-    //   this.setState({ saveConfirm: false });
-    //   this.props.history.push("/admin/customer-information");
-    // };
 
     /**
      * This Method Save Data Into Custom List
@@ -282,7 +291,7 @@ class AddCustomer extends React.Component<
                 CustomerName: customerName,
                 CustomerEmail: customerEmail,
                 CustomerCity: customerCity,
-                IsActive: isActive,
+                isActive: isActive,
                 uuid: uuid.v4(),
             },
         })
@@ -295,30 +304,25 @@ class AddCustomer extends React.Component<
             )
             const result = await response.json()
 
-            if (result.status == 200) {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.success("Data Inserted Successfully")
-                })
-            } else {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.error("Something Is Wrong!!! Try Again Latter")
-                })
-            }
+            result.Id
+                ? this.setState(
+                      {
+                          isButtonLoading: false,
+                          customerEmail: null,
+                          customerCity: null,
+                          customerName: null,
+                      },
+                      () => {
+                          message.success("Data Inserted Successfully")
+                      }
+                  )
+                : this.setState({ isButtonLoading: false }, () => {
+                      message.error("Something Is Wrong!!! Try Again Latter")
+                  })
         } catch (error) {
             console.error(error)
         }
     }
-
-    /**
-     * This Method Is Used To Take Final Save Confirmation
-     * ! I Need To Delete This Code
-     */
-    // onSaveConfirm = () => {
-    //   this.saveCustomer().then(() => {
-    //     this.closeConfirmationDialog();
-    //     this.setState({ saveConfirm: true });
-    //   });
-    // };
 }
 
 /**

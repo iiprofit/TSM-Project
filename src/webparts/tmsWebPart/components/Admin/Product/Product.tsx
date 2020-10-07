@@ -10,6 +10,12 @@ import * as React from "react"
 import { connect } from "react-redux"
 
 /**
+ * React Router Packge Import.
+ * @Link is used to Re-direct user to another section.
+ */
+import { Link } from "react-router-dom"
+
+/**
  * Current Component Props Import From Global Props Location.
  */
 import { IProductProp } from "../../../Store/Types"
@@ -77,17 +83,21 @@ class Product extends React.Component<IProductProp, IProductState> {
                 title: "Actions",
                 dataIndex: "actions",
                 key: "actions",
-                render: (text, record) => (
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
-                ),
+                render: (text, record) => {
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-product/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
+                },
             } as any,
         ],
         rowData: [],
@@ -120,13 +130,15 @@ class Product extends React.Component<IProductProp, IProductState> {
                             <Row>
                                 {/* Add Product Button Section Start */}
                                 <Col span={12}>
-                                    <Button
-                                        type="primary"
-                                        /*@ts-ignore*/
-                                        size="middle"
-                                    >
-                                        Add Product
-                                    </Button>
+                                    <Link to="/new-product">
+                                        <Button
+                                            type="primary"
+                                            /*@ts-ignore*/
+                                            size="middle"
+                                        >
+                                            Add Product
+                                        </Button>
+                                    </Link>
                                 </Col>
                                 {/* Add Product Button Section Start */}
 
@@ -200,7 +212,7 @@ class Product extends React.Component<IProductProp, IProductState> {
                           ({
                               sr: ind + 1,
                               productName: x.ProductName,
-                              isActive: x.IsActive ? "Yes" : "No",
+                              isActive: x.isActive ? "Yes" : "No",
                               actions: x.Id,
                           } as ProductCols)
                   )

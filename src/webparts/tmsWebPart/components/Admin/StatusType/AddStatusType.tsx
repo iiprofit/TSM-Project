@@ -169,7 +169,7 @@ class AddStatusType extends React.Component<
                                         loading={isButtonLoading}
                                         onClick={this.handleSubmit}
                                     >
-                                        Submit
+                                        Save
                                     </Button>
                                 </Col>
                                 <Col span={3} offset={10}>
@@ -243,9 +243,9 @@ class AddStatusType extends React.Component<
             absoluteUrl: absUrl,
             listTitle: listTitles.STATUS_TYPE,
             body: {
-                __metadata: { type: "SP.Data.ChecklistItemTableListItem" },
+                __metadata: { type: "SP.Data.StatusTypeListItem" },
                 StatusTypeName: statusTypeName,
-                IsActive: isActive,
+                isActive: isActive,
                 uuid: uuid.v4(),
             },
         })
@@ -257,15 +257,30 @@ class AddStatusType extends React.Component<
                 options
             )
             const result = await response.json()
-            if (result.status == 200) {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.success("Status Type Inserted Successfully")
-                })
-            } else {
-                this.setState({ isButtonLoading: false }, () => {
-                    message.error("Something Is Wrong!!! Try Again Latter")
-                })
-            }
+
+            result.Id
+                ? this.setState(
+                      {
+                          isButtonLoading: false,
+                          statusTypeName: null,
+                      },
+                      () => {
+                          message.success("Data Inserted Successfully")
+                      }
+                  )
+                : this.setState({ isButtonLoading: false }, () => {
+                      message.error("Something Is Wrong!!! Try Again Latter")
+                  })
+
+            // if (result.status == 200) {
+            //     this.setState({ isButtonLoading: false }, () => {
+            //         message.success("Status Type Inserted Successfully")
+            //     })
+            // } else {
+            //     this.setState({ isButtonLoading: false }, () => {
+            //         message.error("Something Is Wrong!!! Try Again Latter")
+            //     })
+            // }
         } catch (error) {
             console.error(error)
         }
