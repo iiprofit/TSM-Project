@@ -165,7 +165,7 @@ class SearchTickets extends React.Component<
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    <Button
+                    ;<Button
                         shape="circle"
                         type="link"
                         /*@ts-ignore*/
@@ -421,6 +421,11 @@ class SearchTickets extends React.Component<
                                     <Form.Item>
                                         <Button
                                             type="primary"
+                                            danger
+                                            size="middle"
+                                            /*@ts-ignore*/ icon={
+                                                <DownloadOutlined />
+                                            }
                                             onClick={this.downloadSearchResult}
                                         >
                                             Download Result
@@ -690,14 +695,11 @@ class SearchTickets extends React.Component<
                           AssignedTo: x.AssignedTo.Title,
                           CreatedBy: x.Author.Title,
                           DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
-                          createdDate: dayjs(x.Created).format(
-                              "MM-DD-YYYY"
-                          ),
+                          createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
                           TicketStatus: x.StatusId.StatusTypeName,
                       }))
                     : ""
 
-                console.log(downloadResult)
                 this.setState({ downloadData: downloadResult })
                 const _data: Array<TicketCols> = result.value.length
                     ? result.value.map(

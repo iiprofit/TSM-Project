@@ -2,6 +2,7 @@
  * React Package Import
  */
 import * as React from "react"
+
 /**
  * React-Redux Method Import.
  * @param connect This Function Connect Current Component With React-Redux
@@ -14,21 +15,22 @@ import { connect } from "react-redux"
 import * as dayjs from "dayjs"
 
 /**
- * Current Component Props Import From Global Props Location.
- */
-import { IDueTicketsProp } from "../../../Store/Types"
-
-/**
- * Ant Deisgn Component Imports
- */
-import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
-
-/**
  * This Library Used To Create Excel File From Given Data And Download That Excel File
  *
  */
 import * as Exceljs from "exceljs"
 import * as FileSaver from "file-saver"
+
+/**
+ * Current Component Props Import From Global Props Location.
+ */
+import { ITatTicketsProp } from "../../../Store/Types"
+
+/**
+ * Ant Deisgn Component Imports
+ */
+import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
+import { Link } from "react-router-dom"
 
 /**
  * Ant Design Icons Import
@@ -46,16 +48,16 @@ import { readItemsParams, listTitles } from "../../../helper"
  * This Code Block Is Type Declaration Of DataTable
  */
 type TicketCols = {
-    sr?: Number
-    ticketNo?: String
-    ticketTitle?: String
-    customerName?: String
-    productName?: String
-    priority?: String
-    assignedTo?: String
-    createdBy?: String
-    dueDate?: String
-    ticketStatus?: String
+    sr?: number
+    ticketNo?: string
+    ticketTitle?: string
+    customerName?: string
+    productName?: string
+    priority?: string
+    assignedTo?: string
+    createdBy?: string
+    dueDate?: string
+    ticketStatus?: string
     actions?: any
 }
 
@@ -63,10 +65,9 @@ type TicketCols = {
  * Types Declaration Of Current Component States
  * ! I Need To Re-Wirte And un comment states
  */
-type IDueTicketsState = {
+type ITatTicketsState = {
     rowData: Array<TicketCols>
     columns: Array<any>
-    currentdate: any
     searchTicket: string
     isLoading: boolean
     downloadData: Array<any>
@@ -75,14 +76,14 @@ type IDueTicketsState = {
 /**
  * Main Class Of Component.
  */
-class DueTodaysTickets extends React.Component<
-    IDueTicketsProp,
-    IDueTicketsState
+class InTatTickets extends React.Component<
+    ITatTicketsProp,
+    ITatTicketsState
 > {
     /**
      * State Initialization.
      */
-    public state: IDueTicketsState = {
+    public state: ITatTicketsState = {
         columns: [
             { title: "Sr#", dataIndex: "sr", key: "sr" },
             {
@@ -134,21 +135,24 @@ class DueTodaysTickets extends React.Component<
                 title: "Actions",
                 dataIndex: "actions",
                 key: "actions",
-                render: (text, record) => (
-                    <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
-                    </Space>
-                ),
+                render: (text, record) => {
+                    return (
+                        <Space size="middle">
+                            <Link to={`/edit-ticket/${record.actions}`}>
+                                <Button
+                                    shape="circle"
+                                    type="link"
+                                    /*@ts-ignore*/
+                                    icon={<EditOutlined />}
+                                    onClick={() => console.log(record)}
+                                />
+                            </Link>
+                        </Space>
+                    )
+                },
             } as any,
         ],
         rowData: [],
-        currentdate: dayjs().format("YYYY-MM-DD").toString(),
         searchTicket: "",
         isLoading: false,
         downloadData: [],
@@ -159,7 +163,7 @@ class DueTodaysTickets extends React.Component<
      * This Method Also Called Funtion Which Fetch All Customer Details.
      */
     public componentDidMount() {
-        this.fetchDueTickets()
+        this.fetchInProgressTickets()
     }
 
     /**
@@ -181,7 +185,7 @@ class DueTodaysTickets extends React.Component<
                                     <Button
                                         type="primary"
                                         danger
-                                        onClick={this.downloadDueTickets}
+                                        onClick={this.downloadTatTickets}
                                         size="middle"
                                         /*@ts-ignore*/ icon={
                                             <DownloadOutlined />
@@ -207,7 +211,9 @@ class DueTodaysTickets extends React.Component<
                                             /*@ts-ignore*/
                                             icon={<EditOutlined />}
                                             size="middle"
-                                            onClick={this.fetchDueTickets}
+                                            onClick={
+                                                this.fetchInProgressTickets
+                                            }
                                         >
                                             Search
                                         </Button>
@@ -231,67 +237,67 @@ class DueTodaysTickets extends React.Component<
         )
     }
 
-    private fetchDueTickets = async () => {
-        let { currentdate, isLoading } = this.state
-        this.setState({ isLoading: true }, async () => {
-            try {
-                let customfilter = this.customSearch()
-                const { absUrl, httpClient } = this.props
-                const params = readItemsParams({
-                    absoluteUrl: absUrl,
-                    listTitle: listTitles.TICKET_INFORMATION_TABLE,
-                    filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId&$filter=TicketDueDate lt '${currentdate}' and StatusIdId ne 2 ${customfilter} &$orderby=Modified desc`,
-                })
-                console.log(params)
-                const response = await httpClient.get(
-                    params.url,
-                    params.config,
-                    params.options
-                )
-                const result = await response.json()
+    private fetchInProgressTickets = async () => {
+        try {
+            this.setState({ isLoading: true })
+            const { absUrl, httpClient } = this.props
+            // let customfilter = this.customSearch()
+            let customfilter = ""
+            const params = readItemsParams({
+                absoluteUrl: absUrl,
+                listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
+            })
 
-                let downloadResult = result.value.length
-                    ? result.value.map((x: any, ind: number) => ({
-                          SR: ind + 1,
-                          TicketNo: x.TicketNo,
-                          TicketTitle: x.Title,
-                          CustomerName: x.CustomerDetails.CustomerName,
-                          ProductName: x.ProductId.ProductName,
-                          Priority: x.TicketPriority,
-                          AssignedTo: x.AssignedTo.Title,
-                          CreatedBy: x.Author.Title,
-                          DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
-                          createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
-                          TicketStatus: x.StatusId.StatusTypeName,
-                      }))
-                    : ""
-                this.setState({ downloadData: downloadResult })
+            // console.log(params);
 
-                const _data: Array<TicketCols> = result.value.length
-                    ? result.value.map(
-                          (x: any, ind: number) =>
-                              ({
-                                  sr: ind + 1,
-                                  ticketNo: x.TicketNo,
-                                  ticketTitle: x.Title,
-                                  customerName: x.CustomerDetails.CustomerName,
-                                  productName: x.ProductId.ProductName,
-                                  priority: x.TicketPriority,
-                                  assignedTo: x.AssignedTo.Title,
-                                  createdBy: x.Author.Title,
-                                  dueDate: dayjs(x.TicketDueDate).format(
-                                      "MM-DD-YYYY"
-                                  ),
-                                  ticketStatus: x.StatusId.StatusTypeName,
-                                  actions: x.Id,
-                              } as TicketCols)
-                      )
-                    : []
-                this.setState({ rowData: _data, isLoading: false })
-            } catch (error) {
-                console.error("Error while fetch Due Tickets", error)
-            }
-        })
+            const response = await httpClient.get(
+                params.url,
+                params.config,
+                params.options
+            )
+            const result = await response.json()
+
+            let downloadResult = result.value.length
+                ? result.value.map((x: any, ind: number) => ({
+                      SR: ind + 1,
+                      TicketNo: x.TicketNo,
+                      TicketTitle: x.Title,
+                      CustomerName: x.CustomerDetails.CustomerName,
+                      ProductName: x.ProductId.ProductName,
+                      Priority: x.TicketPriority,
+                      AssignedTo: x.AssignedTo.Title,
+                      CreatedBy: x.Author.Title,
+                      DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
+                      createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
+                      TicketStatus: x.StatusId.StatusTypeName,
+                  }))
+                : ""
+            this.setState({ downloadData: downloadResult })
+            const _data: Array<TicketCols> = result.value.length
+                ? result.value.map(
+                      (x: any, ind: number) =>
+                          ({
+                              sr: ind + 1,
+                              ticketNo: x.TicketNo,
+                              ticketTitle: x.Title,
+                              customerName: x.CustomerDetails.CustomerName,
+                              productName: x.ProductId.ProductName,
+                              priority: x.TicketPriority,
+                              assignedTo: x.AssignedTo.Title,
+                              createdBy: x.Author.Title,
+                              dueDate: dayjs(x.TicketDueDate).format(
+                                  "MM-DD-YYYY"
+                              ),
+                              ticketStatus: x.StatusId.StatusTypeName,
+                              actions: x.Id,
+                          } as TicketCols)
+                  )
+                : []
+            this.setState({ rowData: _data, isLoading: false })
+        } catch (error) {
+            console.error("Error while fetchInProgressTickets", error)
+        }
     }
 
     /**
@@ -301,12 +307,12 @@ class DueTodaysTickets extends React.Component<
         try {
             let { searchTicket } = this.state
 
-            let filterVariable: string = ``
+            let filterVariable: string = `&$filter=StatusIdId eq 1`
 
             if (searchTicket) {
-                filterVariable += `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
+                filterVariable = `and (TicketNo eq '${searchTicket}' or Title eq '${searchTicket}' or TicketPriority eq '${searchTicket}' or CustomerDetails/CustomerName eq '${searchTicket}' or AssignedTo/Title eq '${searchTicket}' or ProductId/ProductName eq '${searchTicket}' or StatusId/StatusTypeName eq '${searchTicket}' )`
             } else {
-                filterVariable = ``
+                filterVariable = `&$filter=StatusIdId eq 1`
             }
             return filterVariable
         } catch (error) {
@@ -318,7 +324,7 @@ class DueTodaysTickets extends React.Component<
      * This Method Export  Data Into Excel File.
      * ! We Need To Put Validation For Download. (Range Validation)
      */
-    downloadDueTickets = async () => {
+    downloadTatTickets = async () => {
         try {
             let datarows = this.state.downloadData
             var workbook = new Exceljs.Workbook()
@@ -350,7 +356,7 @@ class DueTodaysTickets extends React.Component<
                 //Download buffer as file using FileSaver
                 FileSaver.saveAs(
                     new Blob([buffer]),
-                    `DueTickets_${dayjs().format("YYYYMMDDHHmmss")}.xlsx`
+                    `TAT_${dayjs().format("YYYYMMDDHHmmss")}.xlsx`
                 )
             })
         } catch (error) {
@@ -358,24 +364,18 @@ class DueTodaysTickets extends React.Component<
         }
     }
 
-    private goToEditTicket = (value) => {
-        try {
-            this.props.history.push({
-                pathname: `/edit-ticket/${value}`,
-                state: {
-                    ticketId: value,
-                },
-            })
-        } catch (error) {
-            console.error("Error while goToEditTicket", error)
-        }
-    }
 }
 
+/**
+ * Redux Map Funtion Which Map Global Store's State To Props Of Current Component.
+ */
 const mapStateToProps = (state) => ({
     absUrl: state.dashboard.absoluteUrl,
     httpClient: state.dashboard.httpClient,
     user: state.login.user,
 })
 
-export default connect(mapStateToProps)(DueTodaysTickets)
+/**
+ * This Funtion Export Component As Well As Connect Current Component With Redux
+ */
+export default connect(mapStateToProps)(InTatTickets)

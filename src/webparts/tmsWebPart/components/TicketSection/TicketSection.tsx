@@ -12,6 +12,9 @@ import { Route, Link } from "react-router-dom"
  */
 import { connect } from "react-redux"
 import { UnregisterCallback } from "history"
+
+import { SaveOutlined ,PlusCircleFilled } from "@ant-design/icons"
+
 /**
  * React Router Dom Package Import.
  * This Package Is Mainly Used For Routing Functinality.
@@ -37,6 +40,7 @@ import ClosedTickets from "./ClosedTickets/ClossedTickets"
 import DueTickets from "./DueTickets/DueTickets"
 import DueTodayTickets from "./DueTodayTicket/DueTodayTickets"
 import InProgrssTickets from "./InProgressTickets/InProgressTickets"
+import TatTickets from "./TAT/TatTickets"
 
 class TicketSection extends React.Component<
     ITicketSectionProp,
@@ -72,7 +76,16 @@ class TicketSection extends React.Component<
                     <Row gutter={[16, 16]}>
                         <Col span={12}>
                             <Link to="/new-ticket">
-                                <Button type="primary" size="middle">
+                                <Button
+                                    type="primary"
+                                    /*@ts-ignore*/
+                                    icon={<PlusCircleFilled />}
+                                    style={{
+                                        background: "green",
+                                        borderColor: "#36454f",
+                                    }}
+                                    size="middle"
+                                >
                                     Add Ticket
                                 </Button>
                             </Link>
@@ -107,9 +120,10 @@ class TicketSection extends React.Component<
                             />
                         </TabPane>
                         <TabPane tab="TAT" key="tat">
-                            <div>
-                                <h4> TAT Section </h4>
-                            </div>
+                        <Route
+                                path="/ticketsection/tat-tickets"
+                                component={TatTickets}
+                            />
                         </TabPane>
                     </Tabs>
                 </>

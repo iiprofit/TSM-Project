@@ -19,6 +19,13 @@ import * as dayjs from "dayjs"
 import { IClosedTicketsProp } from "../../../Store/Types"
 
 /**
+ * This Library Used To Create Excel File From Given Data And Download That Excel File
+ *
+ */
+import * as Exceljs from "exceljs"
+import * as FileSaver from "file-saver"
+
+/**
  * Ant Deisgn Component Imports
  */
 import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
@@ -26,7 +33,7 @@ import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
 /**
  * Ant Design Icons Import
  */
-import { EditOutlined } from "@ant-design/icons"
+import { EditOutlined, DownloadOutlined } from "@ant-design/icons"
 
 /**
  * Helper Section's Methods Import.
@@ -61,6 +68,7 @@ type ICloseTicketsState = {
     columns: Array<any>
     searchTicket: string
     isLoading: boolean
+    downloadData: Array<any>
 }
 
 /**
@@ -141,6 +149,7 @@ class ClossedTickets extends React.Component<
         rowData: [],
         searchTicket: "",
         isLoading: false,
+        downloadData: [],
     }
 
     /**
@@ -166,11 +175,19 @@ class ClossedTickets extends React.Component<
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
                             <Row>
-                                {/* <Col span={12}>
-                                    <Button type="primary" size="middle">
-                                        Add Ticket
+                                <Col span={12}>
+                                    <Button
+                                        type="primary"
+                                        danger
+                                        onClick={this.downloadClosedTickets}
+                                        size="middle"
+                                        /*@ts-ignore*/ icon={
+                                            <DownloadOutlined />
+                                        }
+                                    >
+                                        Download
                                     </Button>
-                                </Col> */}
+                                </Col>
                                 <Col span={12}>
                                     <Space>
                                         <Input
@@ -228,6 +245,24 @@ class ClossedTickets extends React.Component<
                     params.options
                 )
                 const result = await response.json()
+
+                let downloadResult = result.value.length
+                    ? result.value.map((x: any, ind: number) => ({
+                          SR: ind + 1,
+                          TicketNo: x.TicketNo,
+                          TicketTitle: x.Title,
+                          CustomerName: x.CustomerDetails.CustomerName,
+                          ProductName: x.ProductId.ProductName,
+                          Priority: x.TicketPriority,
+                          AssignedTo: x.AssignedTo.Title,
+                          CreatedBy: x.Author.Title,
+                          DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
+                          createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
+                          TicketStatus: x.StatusId.StatusTypeName,
+                      }))
+                    : ""
+                this.setState({ downloadData: downloadResult })
+
                 const _data: Array<TicketCols> = result.value.length
                     ? result.value.map(
                           (x: any, ind: number) =>
@@ -270,6 +305,50 @@ class ClossedTickets extends React.Component<
                 filterVariable = `&$filter=StatusIdId eq 2`
             }
             return filterVariable
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    /**
+     * This Method Export  Data Into Excel File.
+     * ! We Need To Put Validation For Download. (Range Validation)
+     */
+    downloadClosedTickets = async () => {
+        try {
+            let datarows = this.state.downloadData
+            var workbook = new Exceljs.Workbook()
+            //create new sheet in workbook
+            var sheet = workbook.addWorksheet("Export Data")
+
+            let columns = [
+                { header: "Sr", key: "SR", width: 5 },
+                { header: "Ticket No", key: "TicketNo", width: 26 },
+                { header: "Ticket Title", key: "TicketTitle", width: 26 },
+                { header: "Customer Name", key: "CustomerName", width: 26 },
+                { header: "Product Name", key: "ProductName", width: 26 },
+                { header: "Priority", key: "Priority", width: 26 },
+                { header: "Assigned To", key: "AssignedTo", width: 26 },
+                { header: "Created By", key: "CreatedBy", width: 26 },
+                { header: "Due Date", key: "DueDate", width: 26 },
+                {
+                    header: "Ticket Status",
+                    key: "TicketStatus",
+                    width: 26,
+                },
+            ]
+
+            sheet.columns = columns
+            sheet.addRows(datarows)
+
+            //export woekbook into buffer
+            workbook.xlsx.writeBuffer().then((buffer) => {
+                //Download buffer as file using FileSaver
+                FileSaver.saveAs(
+                    new Blob([buffer]),
+                    `ClosedTickets_${dayjs().format("YYYYMMDDHHmmss")}.xlsx`
+                )
+            })
         } catch (error) {
             console.error(error)
         }
