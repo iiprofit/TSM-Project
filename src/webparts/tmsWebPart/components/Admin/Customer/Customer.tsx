@@ -139,7 +139,7 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                         }}
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
-                            <Row>
+                            <Row gutter={[16, 16]}>
                                 {/* Add Customer Button Section Start */}
                                 <Col span={12}>
                                     <Link to="/new-customer">

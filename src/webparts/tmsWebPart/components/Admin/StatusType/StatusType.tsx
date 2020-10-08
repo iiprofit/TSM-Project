@@ -129,7 +129,7 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
                         }}
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
-                            <Row>
+                            <Row gutter={[16, 16]}>
                                 {/* Add Status Button Section Start */}
                                 <Col span={12}>
                                     <Link to="/new-status">

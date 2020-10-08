@@ -127,7 +127,7 @@ class Users extends React.Component<IUsersProp, IUsersState> {
                         }}
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
-                            <Row>
+                            <Row gutter={[16, 16]}>
                                 {/* Add User Button Section Start */}
                                 <Col span={12}>
                                     <Link to="/new-user">

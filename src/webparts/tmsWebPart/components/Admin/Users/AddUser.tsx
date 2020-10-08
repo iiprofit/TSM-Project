@@ -164,16 +164,24 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                         {/* User Name Section Start  */}
                         <Form.Item label="User Name">
                             <Select
-                                placeholder="Inserted are removed"
+                                showSearch
+                                allowClear
+                                filterOption={false}
+                                defaultActiveFirstOption={false}
+                                placeholder="Type at least three characters to search"
                                 value={selectedUser}
+                                onSearch={this.onEmailInputChange}
                                 onChange={(value) =>
                                     this.setState({ selectedUser: value })
                                 }
                                 style={{ width: "100%" }}
                             >
-                                {usersValues.map((item) => (
-                                    <Select.Option key={item} value={item}>
-                                        {item}
+                                {usersValues.map((item, ind) => (
+                                    <Select.Option
+                                        key={`user-${ind + 1}`}
+                                        value={item.value}
+                                    >
+                                        {item.text}
                                     </Select.Option>
                                 ))}
                             </Select>
@@ -255,9 +263,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
         }
     }
 
-    /**
-     * This Method Fetch All Existing User's Email From The User Role Table.
-     */
+    //This Method Fetch All Existing User's Email From The User Role Table.
     fetchUserEmails = async () => {
         try {
             const { httpClient, absUrl } = this.props
@@ -385,6 +391,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                       name: x.Title,
                   }))
             : []
+        console.log(_data)
         this.setState({
             usersValues: _data,
         })
@@ -404,12 +411,13 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
     /**
      * This Method Check That User Must enter Minimum 3 Character Then Search Funtion Can Be Called
      */
-    onEmailInputChange = (e: any) => {
-        e.length > 2 && this.fetchUsersFromAD(e)
+    private onEmailInputChange = (searchText: string) => {
+        console.log(searchText)
+        searchText.length > 2 && this.fetchUsersFromAD(searchText)
     }
 
     // On form submit - on Save button click
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             const { admin, selectedUser, requester } = this.state
 
@@ -431,16 +439,18 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
      * ! I Need to Check Fields Of SharePoint List
      * This Method As Name Suggest Store Data Into SharePoint Custom List
      */
-    saveUser = async () => {
-        const { selectedUser, isActive } = this.state
+    private saveUser = async () => {
+        const { selectedUser, isActive, usersValues } = this.state
         const { absUrl } = this.props
         const { url, config, options } = createItemParams({
             absoluteUrl: absUrl,
             listTitle: listTitles.USER_ROLE_TABLE,
             body: {
                 __metadata: { type: "SP.Data.UserRolesTableListItem" },
-                FirstName: selectedUser.name,
-                EmailId: selectedUser.value,
+                FirstName: usersValues.find(
+                    (user) => user.value == selectedUser
+                ).name,
+                EmailId: selectedUser,
                 Rights: this.rightsToString(),
                 uuid: uuid.v4(),
                 isActive: isActive,
@@ -459,10 +469,10 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                 ? this.setState(
                       {
                           isButtonLoading: false,
-                        
                       },
                       () => {
                           message.success("User Inserted Successfully")
+                          this.props.history.push("/admin/users")
                       }
                   )
                 : this.setState({ isButtonLoading: false }, () => {
@@ -499,7 +509,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
     // };
 
     // Click event for Cancel button on form
-    onCancelClick = () => {
+    private onCancelClick = () => {
         this.props.history.push("/admin/users")
     }
 

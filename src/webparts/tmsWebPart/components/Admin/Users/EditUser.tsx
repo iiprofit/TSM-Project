@@ -84,6 +84,7 @@ type IEditUserState = {
     isButtonLoading: boolean
     roleOptions: Array<any>
     DefaultroleOptions: Array<any>
+    selectedRole: any
 }
 
 //@ts-ignore
@@ -114,6 +115,7 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
             { label: "Admin", value: "admin" },
             { label: "Requester", value: "requester" },
         ],
+        selectedRole: null,
         DefaultroleOptions: [],
     }
 
@@ -140,18 +142,12 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
     public render(): React.ReactElement {
         // Destructuring Of States
         const {
-            validated,
-            invalidItems,
             username,
-            admin,
-            email,
-            requester,
             isActive,
             isLoading,
             isButtonLoading,
             roleOptions,
-            DefaultroleOptions,
-            selectedUser,
+            selectedRole,
         } = this.state
 
         /**
@@ -185,7 +181,7 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
                             <Checkbox.Group
                                 options={roleOptions}
                                 onChange={this.onRoleChange}
-                                defaultValue={DefaultroleOptions}
+                                value={selectedRole}
                             />
                         </Form.Item>
 
@@ -240,17 +236,18 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
 
     onRoleChange = (checkedValues) => {
         try {
-            if (checkedValues.includes("admin")) {
-                this.setState({ admin: true })
-            } else {
-                this.setState({ admin: false })
-            }
+            this.setState({ selectedRole: checkedValues })
+            // if (checkedValues.includes("admin")) {
+            //     this.setState({ admin: true })
+            // } else {
+            //     this.setState({ admin: false })
+            // }
 
-            if (checkedValues.includes("requester")) {
-                this.setState({ requester: true })
-            } else {
-                this.setState({ requester: false })
-            }
+            // if (checkedValues.includes("requester")) {
+            //     this.setState({ requester: true })
+            // } else {
+            //     this.setState({ requester: false })
+            // }
         } catch (error) {
             console.error(error)
         }
@@ -280,25 +277,14 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
             })
             const _user = result
             let rights: Array<any> = _user.Rights.split(",")
-            this.setState(
-                {
-                    admin: rights.indexOf("admin") === -1 ? false : true,
-                    requester:
-                        rights.indexOf("requester") === -1 ? false : true,
-                    email: _user.Email.EMail,
-                    isActive: _user.IsActive,
-                    username: _user.FirstName,
-                },
-                () => {
-                    if (this.state.admin == true) {
-                        let tempVariable = ["admin"]
-                        this.setState({ DefaultroleOptions: tempVariable })
-                    } else if (this.state.requester == true) {
-                        let tempVariable = ["requester"]
-                        this.setState({ DefaultroleOptions: tempVariable })
-                    }
-                }
-            )
+            this.setState({
+                admin: rights.indexOf("admin") === -1 ? false : true,
+                requester: rights.indexOf("requester") === -1 ? false : true,
+                email: _user.Email.EMail,
+                isActive: _user.isActive,
+                username: _user.FirstName,
+                selectedRole: rights,
+            })
         } catch (error) {
             console.error("Error while fetchUserDetails", error)
         }
@@ -318,9 +304,9 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
     // On form submit - on Update button click
     private handleSubmit = () => {
         try {
-            const { admin, requester } = this.state
+            const { admin, requester, selectedRole } = this.state
 
-            if (!requester || !admin) {
+            if (!selectedRole && !selectedRole.length) {
                 message.info("Please check at least one from the Rights.")
             } else {
                 this.setState({ isButtonLoading: true }, async () => {
@@ -343,25 +329,26 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
      */
     private updateUser = async () => {
         try {
-            const { username, isActive, etag } = this.state
+            const { username, isActive, etag, selectedRole } = this.state
             const { absUrl, match, httpClient } = this.props
             const { url, config, options } = updateItemParams({
                 absoluteUrl: absUrl,
                 listTitle: listTitles.USER_ROLE_TABLE,
                 body: {
                     __metadata: { type: "SP.Data.UserRolesTableListItem" },
-                    FirstName: username,
-                    Rights: this.rightsToString(),
-                    IsActive: isActive,
+                    Rights: selectedRole.join(","),
+                    isActive: isActive,
                 },
                 etag: etag,
                 itemId: parseInt(match.params.id),
             })
             const response = await httpClient.post(url, config, options)
-            let result = await response.json()
-            if (result.status == 200) {
+            console.log(response)
+
+            if (response.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("User Updated Successfully")
+                    this.props.history.push("/admin/users")
                 })
             } else {
                 this.setState({ isButtonLoading: false }, () => {

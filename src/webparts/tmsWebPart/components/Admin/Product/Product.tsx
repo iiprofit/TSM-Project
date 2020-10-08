@@ -127,7 +127,7 @@ class Product extends React.Component<IProductProp, IProductState> {
                         }}
                     >
                         <Layout.Content style={{ marginTop: "3em" }}>
-                            <Row>
+                            <Row gutter={[16, 16]}>
                                 {/* Add Product Button Section Start */}
                                 <Col span={12}>
                                     <Link to="/new-product">
