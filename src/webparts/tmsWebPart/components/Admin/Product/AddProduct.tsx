@@ -117,7 +117,7 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
     /**
      * Render() Method
      */
-    render(): React.ReactElement {
+    public render(): React.ReactElement {
         // Destructuring Of States
         const { isActive, productName, isButtonLoading, isLoading } = this.state
 
@@ -197,7 +197,7 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
     /**
      * This Method Perform Validation Checks
      */
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             if (this.state.productName === "") {
                 message.info(
@@ -216,14 +216,14 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
     /**
      * This Method Redirect Users To Product Tab
      */
-    onCancelClick = () => {
+    private onCancelClick = () => {
         this.props.history.push("/admin/product-information")
     }
 
     /**
      * This Method Save Data Into Custom List
      */
-    saveProduct = async () => {
+    private saveProduct = async () => {
         const { isActive, productName } = this.state
         const { absUrl } = this.props
         const { url, config, options } = createItemParams({

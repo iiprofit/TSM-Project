@@ -55,6 +55,7 @@ import EditUser from "./Admin/Users/EditUser"
  */
 type IDashboardState = {
     activeTab: any
+    routeDisplayName: string
 }
 
 class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
@@ -62,25 +63,28 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     // ! We Need To Update Default Active Tab
     public state: IDashboardState = {
         activeTab: "",
+        routeDisplayName: null,
     }
 
     public historyListener: UnregisterCallback = null
 
     // Component Did Mount Method
-    componentDidMount() {
+    public componentDidMount() {
         try {
             // console.log({ l: this.props.location, h: this.props.history });
             this.historyListener = this.props.history.listen((location) => {
                 this.updateActivetab(location.pathname)
+                this.updateRouteDisplayName(location.pathname)
             })
             this.updateActivetab(this.props.location.pathname)
+            this.updateRouteDisplayName(location.pathname)
         } catch (error) {
             console.error(error)
         }
     }
 
     // Component Will Mount Method
-    componentWillUnmount() {
+    public componentWillUnmount() {
         try {
             if (this.historyListener) this.historyListener()
         } catch (error) {
@@ -101,18 +105,16 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                 <div style={{ border: `1px solid darken(#e6e6e6,15%)` }}>
                     <Row>
                         <Col span={12}>
-                            {" "}
-                            <h2> TMS System </h2>{" "}
+                            <h2>{this.getTitle()}</h2>
                         </Col>
                         <Col span={12}>
                             <div>
                                 <p style={{ textAlign: "right" }}>
-                                    {" "}
-                                    {this.props.loggedInUser}{" "}
+                                    {this.props.loggedInUser}
                                 </p>
                                 <p style={{ textAlign: "right" }}>
                                     Version : {this.props.version}
-                                </p>{" "}
+                                </p>
                             </div>
                         </Col>
                     </Row>
@@ -122,10 +124,17 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                                 path="/ticketsection"
                                 component={TicketSection}
                             />
-                            <Route path="/new-ticket" component={NewTicket} />
+                            <Route
+                                path="/new-ticket"
+                                component={(props) => (
+                                    <NewTicket {...props} mode="new" />
+                                )}
+                            />
                             <Route
                                 path="/edit-ticket/:id"
-                                component={EditTicket}
+                                component={(props) => (
+                                    <NewTicket {...props} mode="edit" />
+                                )}
                             />
                         </TabPane>
                         <TabPane tab="Search Section" key="searchsection">
@@ -161,10 +170,7 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                                     path="/edit-status/:id"
                                     component={EditStatusType}
                                 />
-                                 <Route
-                                    path="/new-user"
-                                    component={AddUser}
-                                />
+                                <Route path="/new-user" component={AddUser} />
                                 <Route
                                     path="/edit-user/:id"
                                     component={EditUser}
@@ -175,6 +181,26 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                 </div>
             </>
         )
+    }
+
+    private getTitle() {
+        if (this.state.routeDisplayName) {
+            return `TMS System - ${this.state.routeDisplayName}`
+        } else return "TMS System"
+    }
+
+    private updateRouteDisplayName(location: string) {
+        console.log(location)
+        let title = null
+        switch (location) {
+            case "":
+                title = ""
+                break
+            default:
+                title = null
+                break
+        }
+        this.setState({ routeDisplayName: title })
     }
 
     /**

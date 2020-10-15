@@ -234,7 +234,7 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
      * This Method Check The Selected Roles And Update Values Of State Accordingly.
      */
 
-    onRoleChange = (checkedValues) => {
+    private onRoleChange = (checkedValues) => {
         try {
             this.setState({ selectedRole: checkedValues })
             // if (checkedValues.includes("admin")) {
@@ -290,16 +290,6 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
         }
     }
 
-    /**
-     * This Method Convert Boolean Role Value Into String
-     */
-    private rightsToString = () => {
-        const { admin, requester } = this.state
-        let rights = []
-        requester && rights.push("requester")
-        admin && rights.push("admin")
-        return rights.join(",")
-    }
 
     // On form submit - on Update button click
     private handleSubmit = () => {

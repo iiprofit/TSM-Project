@@ -161,7 +161,12 @@ export interface IEditTatTicketsProp extends RouteComponentProps, CommonProps {
 }
 
 //New Ticket Section's Props
-export interface INewTicketProp extends RouteComponentProps, CommonProps {}
+export interface INewTicketProp extends RouteComponentProps, CommonProps {
+    mode?: string
+    match: match<{
+        id?: string
+    }>
+}
 //Edit Ticket Section's Props
 export interface IEditTicketProp extends RouteComponentProps, CommonProps {
     match: match<{

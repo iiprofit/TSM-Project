@@ -107,7 +107,7 @@ class AddStatusType extends React.Component<
     /**
      * Render() Method
      */
-    render(): React.ReactElement {
+    public render(): React.ReactElement {
         // Destructuring Of States
         const {
             isActive,
@@ -192,7 +192,7 @@ class AddStatusType extends React.Component<
     /**
      * This Method Perform Validation Checks
      */
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             if (this.state.statusTypeName === "") {
                 message.info(
@@ -211,7 +211,7 @@ class AddStatusType extends React.Component<
     /**
      * This Method Redirect Users To Status Type Tab
      */
-    onCancelClick = () => {
+    private onCancelClick = () => {
         this.props.history.push("/admin/status-type")
     }
 
@@ -236,7 +236,7 @@ class AddStatusType extends React.Component<
     /**
      * This Method Save Data Into Custom List
      */
-    saveStatusType = async () => {
+    private saveStatusType = async () => {
         const { isActive, statusTypeName } = this.state
         const { absUrl } = this.props
         const { url, config, options } = createItemParams({

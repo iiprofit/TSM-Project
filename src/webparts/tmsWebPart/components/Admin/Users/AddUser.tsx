@@ -131,7 +131,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
     /**
      * Render() Method
      */
-    render(): React.ReactElement {
+    public render(): React.ReactElement {
         // Destructuring Of States
         const {
             validated,
@@ -245,7 +245,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
      * This Method Check The Selected Roles And Update Values Of State Accordingly.
      */
 
-    onRoleChange = (checkedValues) => {
+    private onRoleChange = (checkedValues) => {
         try {
             if (checkedValues.includes("admin")) {
                 this.setState({ admin: true })
@@ -264,7 +264,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
     }
 
     //This Method Fetch All Existing User's Email From The User Role Table.
-    fetchUserEmails = async () => {
+    private fetchUserEmails = async () => {
         try {
             const { httpClient, absUrl } = this.props
             const params = readItemsParams({
@@ -321,7 +321,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
      * This Method Fetch All Users From Current Tenant
      * @param userQuery This Query Fiend All Users Which Are In Tenant.
      */
-    fetchUsersFromAD = async (userQuery) => {
+    private fetchUsersFromAD = async (userQuery) => {
         const { httpClient, absUrl } = this.props
         let response = await httpClient.post(
             `${absUrl}/_api/SP.UI.ApplicationPages.ClientPeoplePickerWebServiceInterface.clientPeoplePickerSearchUser`,
@@ -400,7 +400,7 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
     /**
      * This Method Convert Boolean Role Value Into String
      */
-    rightsToString = () => {
+    private rightsToString = () => {
         const { admin, requester } = this.state
         let rights = []
         requester && rights.push("requester")

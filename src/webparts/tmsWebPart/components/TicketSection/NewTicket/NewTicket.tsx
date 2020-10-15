@@ -77,26 +77,29 @@ import * as uuid from "uuid"
  * Types Declaration Of Current Component States
  */
 type INewTicketStates = {
-    ticketNo?: string
-    ticketTitle?: string
-    customerName?: Array<any>
-    customerNameSelected: Array<any>
-    productName?: Array<any>
-    productNameSelected: Array<any>
-    priority?: Array<any>
-    prioritySelected: Array<any>
+    allUserData: Array<any>
     assignedTo?: Array<any>
     assignedToSelected: any
+    comment: string
+    customerName?: Array<any>
+    customerNameSelected: Array<any>
+    description: string
     dueDate?: moment.Moment
+    etag: string
+    invalidItems: Array<any>
+    isButtonLoading: boolean
+    isLoading: boolean
+    priority?: Array<any>
+    prioritySelected: Array<any>
+    productName?: Array<any>
+    productNameSelected: Array<any>
+    saveConfirm: boolean
+    showConfirmation: boolean
+    ticketNo?: string
     ticketStatus?: Array<any>
     ticketStatusSelected: Array<any>
+    ticketTitle?: string
     validated: boolean
-    invalidItems: Array<any>
-    showConfirmation: boolean
-    saveConfirm: boolean
-    isLoading: boolean
-    isButtonLoading: boolean
-    allUserData: Array<any>
 }
 
 //@ts-ignore
@@ -135,6 +138,9 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
         productNameSelected: [],
         ticketStatusSelected: [],
         allUserData: [],
+        comment: null,
+        description: null,
+        etag: null,
     }
 
     /**
@@ -142,6 +148,10 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
      * This Method Call All Supported Methods Which Fetch Data For Dropdown/Select Controls
      */
     public componentDidMount() {
+        console.log(this.props)
+        if (this.props.mode === "edit") {
+            this.fetchTicketDetails(this.props.match.params.id)
+        }
         this.onSearchParamsFetch().then(() => {
             this.onRequestereFetch()
             this.onFetchCustomer()
@@ -175,6 +185,8 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             isLoading,
             dueDate,
             allUserData,
+            comment,
+            description,
         } = this.state
 
         /**
@@ -193,7 +205,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 <Spin spinning={isLoading} indicator={loadingIcon}>
                     <Form {...layout} labelAlign="left">
                         {/* Ticket Title Section Start  */}
-                        <Form.Item label="Customer Name">
+                        <Form.Item label="Title">
                             <Input
                                 defaultValue={ticketTitle}
                                 value={ticketTitle}
@@ -202,11 +214,21 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                                         ticketTitle: e.target.value,
                                     })
                                 }
-                                placeholder="Enter customer name"
+                                placeholder="Enter title"
                             />
                         </Form.Item>
                         {/* Ticket Title Section End  */}
-
+                        <Form.Item label="Description">
+                            <Input.TextArea
+                                value={description}
+                                onChange={(e) =>
+                                    this.setState({
+                                        description: e.target.value,
+                                    })
+                                }
+                                placeholder="Enter description"
+                            />
+                        </Form.Item>
                         {/* Customer Name Section Start  */}
                         <Form.Item label="Customer Name">
                             <Select
@@ -231,7 +253,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                         {/* Customer Name Section Start   */}
 
                         {/* Product Section Start  */}
-                        <Form.Item label="Select Product">
+                        <Form.Item label="Product">
                             <Select
                                 showSearch
                                 style={{ width: 200 }}
@@ -298,7 +320,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                         {/* Ticket Status  Section End  */}
 
                         {/* Ticket Status Section Start  */}
-                        <Form.Item label="Ticket Status">
+                        <Form.Item label="Priority">
                             <Select
                                 showSearch
                                 style={{ width: 200 }}
@@ -330,7 +352,17 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                             />
                         </Form.Item>
                         {/* Start Date Selection Section Start */}
-
+                        <Form.Item label="Comment">
+                            <Input.TextArea
+                                value={comment}
+                                onChange={(e) =>
+                                    this.setState({
+                                        comment: e.target.value,
+                                    })
+                                }
+                                placeholder="Enter comment"
+                            />
+                        </Form.Item>
                         {/* Action Button Section Start */}
                         <Form.Item>
                             <Space>
@@ -381,7 +413,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Fetch all Users From USer Table So We Can Used Them In Future.
      */
-    onSearchParamsFetch = async () => {
+    private onSearchParamsFetch = async () => {
         try {
             const { absUrl, httpClient } = this.props
             const params = readItemsParams({
@@ -407,7 +439,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Fetch All Requesters And Arrange Them So We Can Use Them In Ant Design Select Control.
      */
-    onRequestereFetch = async () => {
+    private onRequestereFetch = async () => {
         try {
             let { allUserData } = this.state
             let tempRequesterValue = await allUserData.filter((users) => {
@@ -429,7 +461,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Fetch All Customers And Arrange Them So We Can Use Them In Ant Design Select Control.
      */
-    onFetchCustomer = async () => {
+    private onFetchCustomer = async () => {
         try {
             const { absUrl, httpClient } = this.props
             const params = readItemsParams({
@@ -461,7 +493,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Fetch All Status Types And Arrange Them So We Can Use Them In Ant Design Select Control.
      */
-    onFetchTypes = async () => {
+    private onFetchTypes = async () => {
         try {
             const { absUrl, httpClient } = this.props
             const { ticketStatus } = this.state
@@ -494,7 +526,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Fetch All Products And Arrange Them So We Can Use Them In Ant Design Select Control.
      */
-    onFetchProducts = async () => {
+    private onFetchProducts = async () => {
         try {
             const { absUrl, httpClient } = this.props
             const { productName } = this.state
@@ -527,7 +559,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     /**
      * This Method Perform Validation Checks
      */
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             let {
                 ticketTitle,
@@ -573,6 +605,8 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 ticketStatusSelected,
                 ticketTitle,
                 dueDate,
+                comment,
+                description,
             } = this.state
 
             let params = readItemsParams({
@@ -608,6 +642,8 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                     AssignedToId: assignedToSelected,
                     TicketDueDate: dueDate.format("YYYY-MM-DD"),
                     StatusIdId: ticketStatusSelected,
+                    comment,
+                    description,
                 },
             })
             response = await httpClient.post(
@@ -661,6 +697,49 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             })
         } catch (error) {
             console.error("Error while goToEditTicket", error)
+        }
+    }
+
+    private fetchTicketDetails = async (itemId) => {
+        try {
+            const { httpClient, absUrl } = this.props
+            const param = readItemParams({
+                absoluteUrl: absUrl,
+                itemId: itemId,
+                listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                filters: "",
+            })
+            const response = await httpClient.get(
+                param.url,
+                param.config,
+                param.options
+            )
+            const result = await response.json()
+            this.setState({
+                etag: response.headers.get("ETag"),
+            })
+            const _item = result
+            console.log(result)
+            // this.setState({
+            //     ticketTitle: _item.Title,
+            //     customerNameSelected: this.state.customerName.find(
+            //         (x) => x.value == _item.CustomerDetailsId
+            //     ).CustomerDetailsId,
+            // })
+            this.setState({
+                ticketNo: _item.TicketNo,
+                assignedToSelected: _item.AssignedToId,
+                prioritySelected: _item.TicketPriority,
+                customerNameSelected: _item.CustomerDetailsId,
+                dueDate: _item.TicketDueDate
+                    ? moment(_item.TicketDueDate)
+                    : null,
+                ticketStatusSelected: _item.StatusIdId,
+                ticketTitle: _item.Title,
+                productNameSelected: _item.ProductIdId,
+            })
+        } catch (error) {
+            console.error(error)
         }
     }
 }

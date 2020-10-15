@@ -98,7 +98,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
     /**
      * Render() Method
      */
-    render(): React.ReactElement {
+    public render(): React.ReactElement {
         const {
             isActive,
             validated,
@@ -186,7 +186,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
     /**
      * This Method Specific Data Based On Given It
      */
-    fetchProductDetails = async (itemId) => {
+    private fetchProductDetails = async (itemId) => {
         try {
             const { httpClient, absUrl } = this.props
             const param = readItemParams({
@@ -217,7 +217,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
     /**
      * This Method Perform Validation Checks
      */
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             if (this.state.productName === "") {
                 message.info(
@@ -236,7 +236,7 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
     /**
      * This Method Redirect Users To Customer Tab
      */
-    onCancelClick = () => {
+    private onCancelClick = () => {
         this.props.history.push("/admin/product-information")
     }
 

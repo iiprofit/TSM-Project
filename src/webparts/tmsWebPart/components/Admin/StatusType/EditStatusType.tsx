@@ -101,7 +101,7 @@ class IEditStatusType extends React.Component<
     /**
      * Render() Method
      */
-    render(): React.ReactElement {
+    public render(): React.ReactElement {
         // Destructuring Of States
         const {
             isActive,
@@ -186,7 +186,7 @@ class IEditStatusType extends React.Component<
     /**
      * This Method Specific Data Based On Given It
      */
-    fetchStatusTypeDetails = async (itemId) => {
+    private fetchStatusTypeDetails = async (itemId) => {
         try {
             const { httpClient, absUrl } = this.props
             const param = readItemParams({
@@ -217,7 +217,7 @@ class IEditStatusType extends React.Component<
     /**
      * This Method Perform Validation Checks
      */
-    handleSubmit = async () => {
+    private handleSubmit = async () => {
         try {
             if (this.state.statusTypeName === "") {
                 message.info(
@@ -236,7 +236,7 @@ class IEditStatusType extends React.Component<
     /**
      * This Method Redirect Users To Customer Tab
      */
-    onCancelClick = () => {
+    private onCancelClick = () => {
         this.props.history.push("/admin/status-type")
     }
 
@@ -278,7 +278,7 @@ class IEditStatusType extends React.Component<
     /**
      * This Method Close Confirmation Dialog Box
      */
-    closeConfirmationDialog = () => {
+    private closeConfirmationDialog = () => {
         this.setState({ showConfirmation: false })
     }
 
