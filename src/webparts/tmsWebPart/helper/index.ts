@@ -1,10 +1,32 @@
-// Import GUID List Helper File
+import { SPHttpClientConfiguration } from "@microsoft/sp-http"
+
 export * from "./listGUIDs"
 export * from "./createItem"
 export * from "./readItem"
 export * from "./readItems"
 export * from "./sendEmail"
 export * from "./updateItem"
+export * from "./file"
+export * from "./attachment"
+
+export interface Params {
+    url: string
+    config: SPHttpClientConfiguration
+    options: any
+}
+
+export const Modes = {
+    Add: "add",
+    Edit: "edit",
+}
+
+export const HTTPStatusCodes = {
+    OK: 200,
+    Created: 201,
+    No_Content: 204,
+    Bad_Request: 400,
+    Conflict: 409,
+}
 
 // Types For rightsToBoolean()
 export type rightsBoolean = {

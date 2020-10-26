@@ -18,6 +18,7 @@ import { INewTicketProp } from "../../../Store/Types"
  * This is Time Formating Library
  */
 import * as moment from "moment"
+import { v4 as uuid4 } from "uuid"
 /**
  * Ant Deisgn Component Imports
  */
@@ -32,12 +33,18 @@ import {
     Form,
     message,
     Space,
+    Upload,
+    List,
 } from "antd"
 
 /**
  * Ant Design Icons Import
  */
-import { LoadingOutlined } from "@ant-design/icons"
+import {
+    LoadingOutlined,
+    UploadOutlined,
+    CloseCircleOutlined,
+} from "@ant-design/icons"
 
 // This Options Component Is Used With Select Component.
 const { Option } = Select
@@ -66,13 +73,10 @@ import {
     createItemParams,
     readItemParams,
     sendEmailParams,
+    uploadAttachmentParams,
+    getFileBuffer,
 } from "../../../helper"
-
-/**
- * This Package Is Used To Generate Unique ID's.
- */
-import * as uuid from "uuid"
-
+import * as helper from "../../../helper"
 /**
  * Types Declaration Of Current Component States
  */
@@ -80,13 +84,13 @@ type INewTicketStates = {
     allUserData: Array<any>
     assignedTo?: Array<any>
     assignedToSelected: any
+    attachmentFiles: Array<any>
     comment: string
     customerName?: Array<any>
     customerNameSelected: Array<any>
     description: string
     dueDate?: moment.Moment
     etag: string
-    invalidItems: Array<any>
     isButtonLoading: boolean
     isLoading: boolean
     priority?: Array<any>
@@ -100,6 +104,17 @@ type INewTicketStates = {
     ticketStatusSelected: Array<any>
     ticketTitle?: string
     validated: boolean
+    ticket: {
+        id: { value: number }
+        attachments: {
+            uploaded: {
+                value: Array<any>
+            }
+            willRemove: {
+                value: Array<any>
+            }
+        }
+    }
 }
 
 //@ts-ignore
@@ -127,7 +142,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
         dueDate: moment(),
         ticketStatus: [],
         validated: true,
-        invalidItems: [],
         showConfirmation: false,
         saveConfirm: false,
         isLoading: false,
@@ -141,6 +155,18 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
         comment: null,
         description: null,
         etag: null,
+        attachmentFiles: [],
+        ticket: {
+            id: { value: null },
+            attachments: {
+                uploaded: {
+                    value: [],
+                },
+                willRemove: {
+                    value: [],
+                },
+            },
+        },
     }
 
     /**
@@ -149,7 +175,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
      */
     public componentDidMount() {
         console.log(this.props)
-        if (this.props.mode === "edit") {
+        if (this.props.mode === helper.Modes.Edit) {
             this.fetchTicketDetails(this.props.match.params.id)
         }
         this.onSearchParamsFetch().then(() => {
@@ -363,6 +389,21 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                                 placeholder="Enter comment"
                             />
                         </Form.Item>
+                        <Form.Item label="Attachments">
+                            <Upload
+                                multiple
+                                beforeUpload={this.beforeUploadAttachments}
+                                onRemove={this.onAttachmentRemove}
+                                fileList={this.state.attachmentFiles}
+                            >
+                                {/* @ts-ignore */}
+                                <Button icon={<UploadOutlined />}>
+                                    Upload Attachments
+                                </Button>
+                            </Upload>
+                            {this.getUploadedAttachments()}
+                            {this.getWillRemoveAttachments()}
+                        </Form.Item>
                         {/* Action Button Section Start */}
                         <Form.Item>
                             <Space>
@@ -387,6 +428,25 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 </Spin>
             </>
         )
+    }
+
+    private beforeUploadAttachments = (file: any) => {
+        const uuid = uuid4()
+        this.setState((state) => ({
+            attachmentFiles: [...state.attachmentFiles, file],
+        }))
+        return false
+    }
+
+    private onAttachmentRemove = (file: any) => {
+        this.setState((state) => {
+            const index = state.attachmentFiles.indexOf(file)
+            const newFiles = state.attachmentFiles.slice()
+            newFiles.splice(index, 1)
+            return {
+                attachmentFiles: newFiles,
+            }
+        })
     }
 
     /**
@@ -581,7 +641,11 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 message.info("Invalid Entries. Please Fill All the fields")
             } else {
                 this.setState({ isButtonLoading: true }, async () => {
-                    this.saveNewTicket()
+                    if (this.props.mode == helper.Modes.Edit) {
+                        this.updateTicket()
+                    } else {
+                        this.saveNewTicket()
+                    }
                 })
             }
         } catch (error) {
@@ -607,6 +671,10 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 dueDate,
                 comment,
                 description,
+                attachmentFiles,
+                customerName,
+                productName,
+                ticketStatus,
             } = this.state
 
             let params = readItemsParams({
@@ -651,40 +719,203 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 params.config,
                 params.options
             )
-            result = await response.json()
-            //send emails to respected users after transaction created
-            params = sendEmailParams({
-                absoluteUrl: absUrl,
-                emailBody: {
-                    Body: `
-          <p>Ticket Title: <strong>${this.state.productName}</strong></p>
-          <p>Ticket no: <strong>${this.state.ticketNo}</strong></p>
-          <p>Customer Name: <strong>${this.state.customerName}</strong></p>
-          <p>Product Name: <strong>${this.state.productName}</strong></p>
-          <p>Ticket Priority: <strong>${this.state.priority}</strong></p>
-          <p>Assigned Person Name: <strong>${this.state.assignedTo}</strong></p>
-          <p>Ticket Due Date: <strong>${this.state.dueDate.format(
+            if (response.status == helper.HTTPStatusCodes.Created) {
+                result = await response.json()
+
+                const itemId = result.Id
+
+                for (const f of attachmentFiles) {
+                    const buffer = await getFileBuffer(f)
+
+                    const fileParam = uploadAttachmentParams({
+                        absoluteUrl: absUrl,
+                        itemId,
+                        buffer,
+                        fileName: `${moment().format("YYYYMMDDHHmmss")}_${
+                            f.name
+                        }`,
+                        listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                    })
+
+                    const response = await httpClient.post(
+                        fileParam.url,
+                        fileParam.config,
+                        fileParam.options
+                    )
+                    console.log(response)
+                }
+
+                //send emails to respected users after transaction created
+                params = sendEmailParams({
+                    absoluteUrl: absUrl,
+                    emailBody: {
+                        Body: `
+          <p>Ticket Title: <strong>${ticketTitle}</strong></p>
+          <p>Ticket no: <strong>${ticketNo}</strong></p>
+          <p>Customer Name: <strong>${
+              customerName.find((x) => x.value == customerNameSelected).text
+          }</strong></p>
+          <p>Product Name: <strong>${
+              productName.find((x) => x.value == productNameSelected).text
+          }</strong></p>
+          <p>Ticket Priority: <strong>${prioritySelected}</strong></p>
+          <p>Assigned Person Name: <strong>${
+              assignedTo.find((x) => x.value == assignedToSelected).text
+          }</strong></p>
+          <p>Ticket Due Date: <strong>${dueDate.format(
               "YYYY-MM-DD"
           )}</strong></p>
-          <p>Ticket Status: <strong>${this.state.ticketStatus}</strong></p>
+          <p>Ticket Status: <strong>${
+              ticketStatus.find((x) => x.value == ticketStatusSelected).text
+          }</strong></p>
           <p>Ticket has been created.</p>`,
-                    From: "",
-                    Subject: `Ticket Created - Ticket Id - ${ticketId} `,
-                    To: [
-                        assignedTo.find((x) => x.value == assignedToSelected)
-                            .email,
-                    ],
-                },
-            })
+                        From: "",
+                        Subject: `Ticket Created - Ticket Id - ${ticketId} `,
+                        To: [
+                            assignedTo.find(
+                                (x) => x.value == assignedToSelected
+                            ).email,
+                        ],
+                    },
+                })
 
-            response = await httpClient.post(
-                params.url,
-                params.config,
-                params.options
-            )
+                response = await httpClient.post(
+                    params.url,
+                    params.config,
+                    params.options
+                )
+
+                this.setState({ isButtonLoading: false })
+                this.props.history.push("/ticketsection/in-progress/")
+            } else {
+                throw new Error("Error while creating new ticket")
+            }
         } catch (error) {
             console.error("Error while save New Ticket", error)
         }
+    }
+
+    private updateTicket = async () => {
+        const { absUrl, httpClient, match } = this.props
+        const itemId = parseInt(match.params.id)
+        const {
+            etag,
+            ticketTitle,
+            customerNameSelected,
+            productName,
+            productNameSelected,
+            prioritySelected,
+            assignedToSelected,
+            dueDate,
+            comment,
+            description,
+            ticketStatusSelected,
+            attachmentFiles,
+            ticketNo,
+            customerName,
+            assignedTo,
+            ticketStatus,
+        } = this.state
+        const params = helper.updateItemParams({
+            absoluteUrl: absUrl,
+            etag,
+            body: {
+                __metadata: {
+                    type: "SP.Data.TicketInformationTableListItem",
+                },
+                Title: ticketTitle,
+                CustomerDetailsId: customerNameSelected,
+                ProductIdId: productNameSelected,
+                TicketPriority: prioritySelected,
+                AssignedToId: assignedToSelected,
+                TicketDueDate: dueDate.format("YYYY-MM-DD"),
+                StatusIdId: ticketStatusSelected,
+                comment,
+                description,
+            },
+            itemId,
+            listTitle: listTitles.TICKET_INFORMATION_TABLE,
+        })
+        const response = await httpClient.post(
+            params.url,
+            params.config,
+            params.options
+        )
+        console.log(response)
+
+        const willRemove = this.state.ticket.attachments.willRemove.value
+        for (const f of willRemove) {
+            const removeParams = helper.deleteAttachmentParams({
+                absoluteUrl: absUrl,
+                itemId,
+                listTitle: listTitles.TICKET_INFORMATION_TABLE,
+                fileName: f.FileName,
+            })
+            const removeResponse = await httpClient.post(
+                removeParams.url,
+                removeParams.config,
+                removeParams.options
+            )
+            console.log(removeResponse)
+        }
+
+        for (const f of attachmentFiles) {
+            const buffer = await getFileBuffer(f)
+
+            const fileParam = uploadAttachmentParams({
+                absoluteUrl: absUrl,
+                itemId,
+                buffer,
+                fileName: `${moment().format("YYYYMMDDHHmmss")}_${f.name}`,
+                listTitle: listTitles.TICKET_INFORMATION_TABLE,
+            })
+
+            const response = await httpClient.post(
+                fileParam.url,
+                fileParam.config,
+                fileParam.options
+            )
+            console.log(response)
+        }
+
+        //send emails to respected users after transaction created
+        const emailParams = sendEmailParams({
+            absoluteUrl: absUrl,
+            emailBody: {
+                Body: `
+  <p>Ticket Title: <strong>${ticketTitle}</strong></p>
+  <p>Ticket no: <strong>${ticketNo}</strong></p>
+  <p>Customer Name: <strong>${
+      customerName.find((x) => x.value == customerNameSelected).text
+  }</strong></p>
+  <p>Product Name: <strong>${
+      productName.find((x) => x.value == productNameSelected).text
+  }</strong></p>
+  <p>Ticket Priority: <strong>${prioritySelected}</strong></p>
+  <p>Assigned Person Name: <strong>${
+      assignedTo.find((x) => x.value == assignedToSelected).text
+  }</strong></p>
+  <p>Ticket Due Date: <strong>${dueDate.format("YYYY-MM-DD")}</strong></p>
+  <p>Ticket Status: <strong>${
+      ticketStatus.find((x) => x.value == ticketStatusSelected).text
+  }</strong></p>
+  <p>Ticket has been updated.</p>`,
+                From: "",
+                Subject: `Ticket Edited - Ticket Id - ${ticketNo} `,
+                To: [
+                    assignedTo.find((x) => x.value == assignedToSelected).email,
+                ],
+            },
+        })
+
+        const emailResponse = await httpClient.post(
+            params.url,
+            params.config,
+            params.options
+        )
+
+        this.setState({ isButtonLoading: false })
+        this.props.history.push("/ticketsection/in-progress/")
     }
 
     /**
@@ -707,7 +938,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 absoluteUrl: absUrl,
                 itemId: itemId,
                 listTitle: listTitles.TICKET_INFORMATION_TABLE,
-                filters: "",
+                filters: `$select=*,AttachmentFiles&$expand=AttachmentFiles`,
             })
             const response = await httpClient.get(
                 param.url,
@@ -720,13 +951,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             })
             const _item = result
             console.log(result)
-            // this.setState({
-            //     ticketTitle: _item.Title,
-            //     customerNameSelected: this.state.customerName.find(
-            //         (x) => x.value == _item.CustomerDetailsId
-            //     ).CustomerDetailsId,
-            // })
-            this.setState({
+            this.setState((state) => ({
                 ticketNo: _item.TicketNo,
                 assignedToSelected: _item.AssignedToId,
                 prioritySelected: _item.TicketPriority,
@@ -737,11 +962,184 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 ticketStatusSelected: _item.StatusIdId,
                 ticketTitle: _item.Title,
                 productNameSelected: _item.ProductIdId,
-            })
+                comment: _item.comment,
+                description: _item.description,
+                ticket: {
+                    ...state.ticket,
+                    id: {
+                        value: _item.Id,
+                    },
+                    attachments: {
+                        ...state.ticket.attachments,
+                        uploaded: {
+                            value: _item.AttachmentFiles,
+                        },
+                    },
+                },
+            }))
         } catch (error) {
             console.error(error)
         }
     }
+
+    private getUploadedAttachments = () => {
+        const { value } = this.state.ticket.attachments.uploaded
+        return value.length ? (
+            <List
+                bordered
+                style={{ marginTop: "16px" }}
+                header={<div>Uploaded Attachments</div>}
+                dataSource={value}
+                renderItem={(item, ind) => (
+                    <List.Item>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                width: "100%",
+                            }}
+                        >
+                            <a
+                                href={`${item.ServerRelativeUrl}?web=1`}
+                                target="_blank"
+                            >
+                                {item.FileName}
+                            </a>
+                            <div>
+                                <Button
+                                    icon={
+                                        <CloseCircleOutlined
+                                            onAuxClick={null}
+                                            onAuxClickCapture={null}
+                                            translate={null}
+                                        />
+                                    }
+                                    type="dashed"
+                                    shape="circle"
+                                    onClick={() => {
+                                        this.setState((state) => {
+                                            const newItems = state.ticket.attachments.uploaded.value.slice()
+                                            const removedItems = newItems.splice(
+                                                ind,
+                                                1
+                                            )
+                                            return {
+                                                ticket: {
+                                                    ...state.ticket,
+                                                    attachments: {
+                                                        uploaded: {
+                                                            value: newItems,
+                                                        },
+                                                        willRemove: {
+                                                            value: [
+                                                                ...state.ticket
+                                                                    .attachments
+                                                                    .willRemove
+                                                                    .value,
+                                                                ...removedItems,
+                                                            ],
+                                                        },
+                                                    },
+                                                },
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </List.Item>
+                )}
+            />
+        ) : null
+    }
+
+    private getWillRemoveAttachments = () => {
+        const { value } = this.state.ticket.attachments.willRemove
+        return value.length ? (
+            <List
+                bordered
+                style={{ marginTop: "16px" }}
+                header={<div>Attachments Will Remove</div>}
+                dataSource={value}
+                renderItem={(item, ind) => (
+                    <List.Item>
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                width: "100%",
+                            }}
+                        >
+                            <a
+                                href={`${item.ServerRelativeUrl}?web=1`}
+                                target="_blank"
+                                style={{ color: "red" }}
+                            >
+                                {item.FileName}
+                            </a>
+                            <div>
+                                <Button
+                                    icon={
+                                        <CloseCircleOutlined
+                                            onAuxClick={null}
+                                            onAuxClickCapture={null}
+                                            translate={null}
+                                        />
+                                    }
+                                    type="dashed"
+                                    shape="circle"
+                                    onClick={() => {
+                                        this.setState((state) => {
+                                            const newItems = state.ticket.attachments.willRemove.value.slice()
+                                            const removedItems = newItems.splice(
+                                                ind,
+                                                1
+                                            )
+                                            return {
+                                                ticket: {
+                                                    ...state.ticket,
+                                                    attachments: {
+                                                        uploaded: {
+                                                            value: [
+                                                                ...state.ticket
+                                                                    .attachments
+                                                                    .uploaded
+                                                                    .value,
+                                                                ...removedItems,
+                                                            ],
+                                                        },
+                                                        willRemove: {
+                                                            value: newItems,
+                                                        },
+                                                    },
+                                                },
+                                            }
+                                        })
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </List.Item>
+                )}
+            />
+        ) : null
+    }
+
+    // private fetchAttachmentsForItem = async (itemId: number) => {
+    //     const { absUrl, httpClient } = this.props
+    //     const params = helper.fetchAttachmentsParams({
+    //         absoluteUrl: this.props.absUrl,
+    //         listTitle: listTitles.TICKET_INFORMATION_TABLE,
+    //         itemId,
+    //     })
+    //     const response = await httpClient.get(
+    //         params.url,
+    //         params.config,
+    //         params.options
+    //     )
+    //     const result = await response.json()
+    //     console.log(result)
+    // }
 }
 
 /**

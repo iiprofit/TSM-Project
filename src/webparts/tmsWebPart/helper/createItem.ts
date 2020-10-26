@@ -3,24 +3,15 @@
  * Both Packages Are Used For Configuration.
  *
  */
-import { SPHttpClientConfiguration, SPHttpClient } from "@microsoft/sp-http"
-
+import { SPHttpClient } from "@microsoft/sp-http"
+import { Params } from "."
 /**
  * Parameters For CreateItemParams Method
  */
-type ItemParam = {
+export interface ICreateItem {
     absoluteUrl: string
     listTitle: string
     body: any
-}
-
-/**
- * These Are Types Of Above Parameters.
- */
-type createItem = {
-    url: string
-    config: SPHttpClientConfiguration
-    options: any
 }
 
 /**
@@ -28,19 +19,15 @@ type createItem = {
  * Developer Needs To Only Pass URL,Body(Data) And List Title Then That Data Will Be Added Into SharePoint List.
  * You Can Consider This As Global Method For Inserting Data Into SharePoint List.
  */
-export const createItemParams = ({
-    absoluteUrl,
-    body,
-    listTitle,
-}: ItemParam): createItem => {
-    const url = `${absoluteUrl}/_api/web/lists/getbytitle('${listTitle}')/items`
+export const createItemParams = (param: ICreateItem): Params => {
+    const url = `${param.absoluteUrl}/_api/web/lists/getbytitle('${param.listTitle}')/items`
     const data = {
         headers: {
             accept: "application/json;odata=nometadata",
             "content-type": "application/json;odata=verbose",
             "odata-version": "",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(param.body),
     }
     return {
         url: url,

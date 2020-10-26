@@ -49,6 +49,7 @@ import AddStatusType from "./Admin/StatusType/AddStatusType"
 import EditStatusType from "./Admin/StatusType/EditStatusType"
 import AddUser from "./Admin/Users/AddUser"
 import EditUser from "./Admin/Users/EditUser"
+import * as helper from "../helper"
 
 /**
  * Declaring Types Of Compoent States
@@ -127,13 +128,19 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                             <Route
                                 path="/new-ticket"
                                 component={(props) => (
-                                    <NewTicket {...props} mode="new" />
+                                    <NewTicket
+                                        {...props}
+                                        mode={helper.Modes.Add}
+                                    />
                                 )}
                             />
                             <Route
                                 path="/edit-ticket/:id"
                                 component={(props) => (
-                                    <NewTicket {...props} mode="edit" />
+                                    <NewTicket
+                                        {...props}
+                                        mode={helper.Modes.Edit}
+                                    />
                                 )}
                             />
                         </TabPane>
