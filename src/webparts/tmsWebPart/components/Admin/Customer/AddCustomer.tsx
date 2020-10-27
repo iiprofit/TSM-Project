@@ -42,7 +42,7 @@ import { IAddCustomerProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form , Radio } from "antd"
+import { Row, Col, Input, Button, message, Spin, Form, Radio } from "antd"
 
 /**
  * Ant Design Icons Import
@@ -186,12 +186,11 @@ class AddCustomer extends React.Component<
                         </Form.Item>
                         {/* Customer Email Address Section End  */}
 
-                          {/* Customer Active Status Section Start  */}
-                          <Form.Item label="Active Status">
+                        {/* Customer Active Status Section Start  */}
+                        <Form.Item label="Active Status">
                             {/* <Switch
                                 checked={isActive}
                                 onChange={(value) => {
-                                    console.log(value)
                                     this.setState({ isActive: value })
                                 }}
                             /> */}

@@ -553,21 +553,14 @@ class IEditTicket extends React.Component<IEditTicketProp, IEditTicketStates> {
                 etag: response.headers.get("ETag"),
             })
             const _item = result
-            console.log(result)
-            // this.setState({
-            //     ticketTitle: _item.Title,
-            //     customerNameSelected: this.state.customerName.find(
-            //         (x) => x.value == _item.CustomerDetailsId
-            //     ).CustomerDetailsId,
-            // })
             this.setState({
-                ticketNo : _item.ticketNo,
-                assignedToSelected : _item.assignedTo,
-                prioritySelected : _item.priority,
-                customerNameSelected : _item.customerName,
-                dueDate : _item.dueDate,
-                ticketStatusSelected : _item.ticketStatus,
-                ticketTitle : _item.ticketStatus
+                ticketNo: _item.ticketNo,
+                assignedToSelected: _item.assignedTo,
+                prioritySelected: _item.priority,
+                customerNameSelected: _item.customerName,
+                dueDate: _item.dueDate,
+                ticketStatusSelected: _item.ticketStatus,
+                ticketTitle: _item.ticketStatus,
             })
         } catch (error) {
             console.error(error)

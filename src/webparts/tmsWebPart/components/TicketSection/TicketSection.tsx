@@ -13,7 +13,7 @@ import { Route, Link } from "react-router-dom"
 import { connect } from "react-redux"
 import { UnregisterCallback } from "history"
 
-import { SaveOutlined ,PlusCircleFilled } from "@ant-design/icons"
+import { SaveOutlined, PlusCircleFilled } from "@ant-design/icons"
 
 /**
  * React Router Dom Package Import.
@@ -61,7 +61,7 @@ class TicketSection extends React.Component<
             })
             this.updateActivetab(this.props.location.pathname)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -120,7 +120,7 @@ class TicketSection extends React.Component<
                             />
                         </TabPane>
                         <TabPane tab="TAT" key="tat">
-                        <Route
+                            <Route
                                 path="/ticketsection/tat-tickets"
                                 component={TatTickets}
                             />
@@ -134,8 +134,6 @@ class TicketSection extends React.Component<
     private onTabSelect = (tab) => {
         try {
             const { history } = this.props
-            // this.setState({ activeTab: tab });
-            // console.log(tab);
             switch (tab) {
                 case "inProgressTickets":
                     history.push("/ticketsection/in-progress")

@@ -42,7 +42,7 @@ import {
 /**
  * Ant Design Icons Import
  */
-import { EditOutlined } from "@ant-design/icons"
+import { EditOutlined, DownloadOutlined } from "@ant-design/icons"
 
 // This Options Component Is Used With Select Component.
 const { Option } = Select
@@ -165,13 +165,14 @@ class SearchTickets extends React.Component<
                 dataIndex: "actions",
                 key: "actions",
                 render: (text, record) => {
-                    ;<Button
-                        shape="circle"
-                        type="link"
-                        /*@ts-ignore*/
-                        icon={<EditOutlined />}
-                        onClick={() => console.log(record)}
-                    />
+                    return (
+                        <Button
+                            shape="circle"
+                            type="link"
+                            /*@ts-ignore*/
+                            icon={<EditOutlined />}
+                        />
+                    )
                 },
             } as any,
         ],
@@ -294,7 +295,6 @@ class SearchTickets extends React.Component<
                                             placeholder="Ticket Status Type"
                                             optionFilterProp="children"
                                             onChange={(value) => {
-                                                console.log(value)
                                                 this.setState({
                                                     srchStatusTypeSelected: value,
                                                 })
@@ -347,7 +347,6 @@ class SearchTickets extends React.Component<
                                             value={srchAssignedToSelected}
                                             optionFilterProp="children"
                                             onChange={(value) => {
-                                                console.log(value)
                                                 this.setState({
                                                     srchAssignedToSelected: value,
                                                 })
@@ -507,8 +506,6 @@ class SearchTickets extends React.Component<
             let tempRequesterValue = await allUserData.filter((users) => {
                 return users.Rights.includes("requester")
             })
-            // console.log("Requester Fetch Log");
-            // console.log(allUserData);
             let _result = tempRequesterValue.map((x: any, ind: number) => {
                 return {
                     value: x.EmailId ? x.EmailId : "",
@@ -591,11 +588,8 @@ class SearchTickets extends React.Component<
      */
     private customSearch = () => {
         try {
-            // console.log(this.state.srchCustomerSelected);
             const { absUrl, httpClient } = this.props
             let filterVariable: string
-            console.log("i am in custom search")
-
             let {
                 invaliddate,
                 startDate,
@@ -605,7 +599,6 @@ class SearchTickets extends React.Component<
                 srchPrioritySelected,
                 srchStatusTypeSelected,
             } = this.state
-            // console.log(srchStatusTypeSelected);
             let tempstartdate = startDate
                 ? startDate.format("YYYY-MM-DD").toString()
                 : null
@@ -652,8 +645,6 @@ class SearchTickets extends React.Component<
                         : (filterVariable += ` and (Created ge '${tempstartdate}' and Created le '${tempenddate}')`)
                 }
             }
-
-            console.log(filterVariable)
             return filterVariable
         } catch (error) {
             console.error("Error while customSearch", error)
@@ -669,34 +660,31 @@ class SearchTickets extends React.Component<
         this.setState({ isLoading: true }, async () => {
             try {
                 let customfilter = this.customSearch()
-                console.log(customfilter)
                 const params = readItemsParams({
                     absoluteUrl: absUrl,
                     listTitle: listTitles.TICKET_INFORMATION_TABLE,
                     filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
                     // filters: `$select=*,ChecklistTransaction/Id,ChecklistTransaction/ProductName,ChecklistTransaction/ReleaseName,ChecklistTransaction/JiraTicketNo,Author/Title,Editor/Title,ApprovedBy/Title&$expand=ChecklistTransaction,Author,Editor,ApprovedBy${this.customSearch()}&$orderby=Modified desc`
                 })
-                console.log(params)
                 const response = await httpClient.get(
                     params.url,
                     params.config,
                     params.options
                 )
                 const result = await response.json()
-                console.log(result)
                 let downloadResult = result.value.length
                     ? result.value.map((x: any, ind: number) => ({
                           SR: ind + 1,
                           TicketNo: x.TicketNo,
                           TicketTitle: x.Title,
-                          CustomerName: x.CustomerDetails.CustomerName,
-                          ProductName: x.ProductId.ProductName,
+                          CustomerName: x?.CustomerDetails?.CustomerName,
+                          ProductName: x?.ProductId?.ProductName,
                           Priority: x.TicketPriority,
-                          AssignedTo: x.AssignedTo.Title,
+                          AssignedTo: x?.AssignedTo?.Title,
                           CreatedBy: x.Author.Title,
                           DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
                           createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
-                          TicketStatus: x.StatusId.StatusTypeName,
+                          TicketStatus: x?.StatusId?.StatusTypeName,
                       }))
                     : ""
 
@@ -708,10 +696,11 @@ class SearchTickets extends React.Component<
                                   sr: ind + 1,
                                   ticketNo: x.TicketNo,
                                   ticketTitle: x.Title,
-                                  customerName: x.CustomerDetails.CustomerName,
-                                  productName: x.ProductId.ProductName,
+                                  customerName:
+                                      x?.CustomerDetails?.CustomerName,
+                                  productName: x?.ProductId?.ProductName,
                                   priority: x.TicketPriority,
-                                  assignedTo: x.AssignedTo.Title,
+                                  assignedTo: x?.AssignedTo?.Title,
                                   createdBy: x.Author.Title,
                                   dueDate: dayjs(x.TicketDueDate).format(
                                       "MM-DD-YYYY"
@@ -719,12 +708,11 @@ class SearchTickets extends React.Component<
                                   createdDate: dayjs(x.Created).format(
                                       "MM-DD-YYYY"
                                   ),
-                                  ticketStatus: x.StatusId.StatusTypeName,
+                                  ticketStatus: x?.StatusId?.StatusTypeName,
                                   actions: x.Id,
                               } as TicketCols)
                       )
                     : []
-                // console.log(_data);
                 this.setState({ rowData: _data, isLoading: false })
             } catch (error) {
                 console.error("Error while fetch Search Result", error)

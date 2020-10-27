@@ -72,7 +72,6 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     // Component Did Mount Method
     public componentDidMount() {
         try {
-            // console.log({ l: this.props.location, h: this.props.history });
             this.historyListener = this.props.history.listen((location) => {
                 this.updateActivetab(location.pathname)
                 this.updateRouteDisplayName(location.pathname)
@@ -197,7 +196,6 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     }
 
     private updateRouteDisplayName(location: string) {
-        console.log(location)
         let title = null
         switch (location) {
             case "":
@@ -247,7 +245,6 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
      */
     private updateActivetab = (location: string) => {
         try {
-            // console.log({ location });
             let _admin = [
                 "release",
                 "checklist",

@@ -29,7 +29,7 @@ import * as FileSaver from "file-saver"
  * Ant Deisgn Component Imports
  */
 import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
-
+import { Link } from "react-router-dom"
 /**
  * Ant Design Icons Import
  */
@@ -135,13 +135,14 @@ class ClossedTickets extends React.Component<
                 key: "actions",
                 render: (text, record) => (
                     <Space size="middle">
-                        <Button
-                            shape="circle"
-                            type="link"
-                            /*@ts-ignore*/
-                            icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
-                        />
+                        <Link to={`/edit-ticket/${record.actions}`}>
+                            <Button
+                                shape="circle"
+                                type="link"
+                                /*@ts-ignore*/
+                                icon={<EditOutlined />}
+                            />
+                        </Link>
                     </Space>
                 ),
             } as any,

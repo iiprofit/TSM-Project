@@ -76,10 +76,7 @@ type ITatTicketsState = {
 /**
  * Main Class Of Component.
  */
-class InTatTickets extends React.Component<
-    ITatTicketsProp,
-    ITatTicketsState
-> {
+class InTatTickets extends React.Component<ITatTicketsProp, ITatTicketsState> {
     /**
      * State Initialization.
      */
@@ -144,7 +141,6 @@ class InTatTickets extends React.Component<
                                     type="link"
                                     /*@ts-ignore*/
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log(record)}
                                 />
                             </Link>
                         </Space>
@@ -248,9 +244,6 @@ class InTatTickets extends React.Component<
                 listTitle: listTitles.TICKET_INFORMATION_TABLE,
                 filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId${customfilter}&$orderby=Modified desc`,
             })
-
-            // console.log(params);
-
             const response = await httpClient.get(
                 params.url,
                 params.config,
@@ -263,14 +256,14 @@ class InTatTickets extends React.Component<
                       SR: ind + 1,
                       TicketNo: x.TicketNo,
                       TicketTitle: x.Title,
-                      CustomerName: x.CustomerDetails.CustomerName,
-                      ProductName: x.ProductId.ProductName,
+                      CustomerName: x?.CustomerDetails?.CustomerName,
+                      ProductName: x?.ProductId?.ProductName,
                       Priority: x.TicketPriority,
-                      AssignedTo: x.AssignedTo.Title,
+                      AssignedTo: x?.AssignedTo?.Title,
                       CreatedBy: x.Author.Title,
                       DueDate: dayjs(x.TicketDueDate).format("MM-DD-YYYY"),
                       createdDate: dayjs(x.Created).format("MM-DD-YYYY"),
-                      TicketStatus: x.StatusId.StatusTypeName,
+                      TicketStatus: x?.StatusId?.StatusTypeName,
                   }))
                 : ""
             this.setState({ downloadData: downloadResult })
@@ -281,15 +274,15 @@ class InTatTickets extends React.Component<
                               sr: ind + 1,
                               ticketNo: x.TicketNo,
                               ticketTitle: x.Title,
-                              customerName: x.CustomerDetails.CustomerName,
-                              productName: x.ProductId.ProductName,
+                              customerName: x?.CustomerDetails?.CustomerName,
+                              productName: x?.ProductId?.ProductName,
                               priority: x.TicketPriority,
-                              assignedTo: x.AssignedTo.Title,
+                              assignedTo: x?.AssignedTo?.Title,
                               createdBy: x.Author.Title,
                               dueDate: dayjs(x.TicketDueDate).format(
                                   "MM-DD-YYYY"
                               ),
-                              ticketStatus: x.StatusId.StatusTypeName,
+                              ticketStatus: x?.StatusId?.StatusTypeName,
                               actions: x.Id,
                           } as TicketCols)
                   )
@@ -363,7 +356,6 @@ class InTatTickets extends React.Component<
             console.error(error)
         }
     }
-
 }
 
 /**

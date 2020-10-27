@@ -90,7 +90,6 @@ class Users extends React.Component<IUsersProp, IUsersState> {
                                     type="link"
                                     /*@ts-ignore*/
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log(record)}
                                 />
                             </Link>
                         </Space>

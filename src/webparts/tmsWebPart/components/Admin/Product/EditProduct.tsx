@@ -260,8 +260,6 @@ class IEditProduct extends React.Component<IEditProductProp, IProductStates> {
             })
             const response = await httpClient.post(url, config, options)
             let result = response
-
-            console.log(result)
             if (result.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("Data Update Successfully")

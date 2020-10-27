@@ -333,8 +333,6 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
                 itemId: parseInt(match.params.id),
             })
             const response = await httpClient.post(url, config, options)
-            console.log(response)
-
             if (response.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("User Updated Successfully")

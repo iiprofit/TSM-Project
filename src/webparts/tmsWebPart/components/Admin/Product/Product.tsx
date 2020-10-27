@@ -92,7 +92,6 @@ class Product extends React.Component<IProductProp, IProductState> {
                                     type="link"
                                     /*@ts-ignore*/
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log(record)}
                                 />
                             </Link>
                         </Space>

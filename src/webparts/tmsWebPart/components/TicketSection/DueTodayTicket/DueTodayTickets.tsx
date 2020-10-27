@@ -40,7 +40,7 @@ import { Table, Row, Col, Input, Button, Space, Spin, Layout } from "antd"
 /**
  * Ant Design Icons Import
  */
-import { EditOutlined , DownloadOutlined } from "@ant-design/icons"
+import { EditOutlined, DownloadOutlined } from "@ant-design/icons"
 
 /**
  * Helper Section's Methods Import.
@@ -148,7 +148,6 @@ class DueTodaysTickets extends React.Component<
                             type="link"
                             /*@ts-ignore*/
                             icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
                         />
                     </Space>
                 ),

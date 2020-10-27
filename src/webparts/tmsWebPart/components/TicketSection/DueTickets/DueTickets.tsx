@@ -141,7 +141,6 @@ class DueTodaysTickets extends React.Component<
                             type="link"
                             /*@ts-ignore*/
                             icon={<EditOutlined />}
-                            onClick={() => console.log(record)}
                         />
                     </Space>
                 ),
@@ -242,7 +241,6 @@ class DueTodaysTickets extends React.Component<
                     listTitle: listTitles.TICKET_INFORMATION_TABLE,
                     filters: `$select=*,Author/Title,Editor/Title,CustomerDetails/CustomerName,AssignedTo/Title,ProductId/ProductName,StatusId/StatusTypeName&$expand=Author,Editor,CustomerDetails,AssignedTo,ProductId,StatusId&$filter=TicketDueDate lt '${currentdate}' and StatusIdId ne 2 ${customfilter} &$orderby=Modified desc`,
                 })
-                console.log(params)
                 const response = await httpClient.get(
                     params.url,
                     params.config,

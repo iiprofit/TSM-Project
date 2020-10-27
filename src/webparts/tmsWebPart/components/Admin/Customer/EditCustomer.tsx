@@ -24,7 +24,17 @@ import { IEditCustomerProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form, Switch, Radio } from "antd"
+import {
+    Row,
+    Col,
+    Input,
+    Button,
+    message,
+    Spin,
+    Form,
+    Switch,
+    Radio,
+} from "antd"
 
 /**
  * Ant Design Icons Import
@@ -184,7 +194,6 @@ class IEditCustomer extends React.Component<
                             {/* <Switch
                                 checked={isActive}
                                 onChange={(value) => {
-                                    console.log(value)
                                     this.setState({ isActive: value })
                                 }}
                             /> */}
@@ -252,7 +261,6 @@ class IEditCustomer extends React.Component<
                 etag: response.headers.get("ETag"),
             })
             const _item = result
-            console.log(_item)
             this.setState({
                 customerName: _item.CustomerName,
                 customerEmail: _item.CustomerEmail,
@@ -328,7 +336,7 @@ class IEditCustomer extends React.Component<
             })
             const response = await httpClient.post(url, config, options)
             const result = await response
-            
+
             if (result.status == 204) {
                 this.setState({ isButtonLoading: false }, () => {
                     message.success("Data Updated Successfully")

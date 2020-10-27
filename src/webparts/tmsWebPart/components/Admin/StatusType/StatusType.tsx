@@ -92,7 +92,6 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
                                     type="link"
                                     /*@ts-ignore*/
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log(record)}
                                 />
                             </Link>
                         </Space>

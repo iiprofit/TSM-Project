@@ -102,7 +102,6 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                                     type="link"
                                     /*@ts-ignore*/
                                     icon={<EditOutlined />}
-                                    onClick={() => console.log(record)}
                                 />
                             </Link>
                         </Space>
@@ -213,14 +212,12 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
                     listTitle: listTitles.CUSTOMER_INFORMATION,
                     filters: `${customfilter}`,
                 })
-                console.log(params)
                 const response = await httpClient.get(
                     params.url,
                     params.config,
                     params.options
                 )
                 const result = await response.json()
-                console.log(result)
                 const _data: Array<CustomerCols> = result.value.length
                     ? result.value.map(
                           (x: any, ind: number) =>

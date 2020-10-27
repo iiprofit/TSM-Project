@@ -59,7 +59,7 @@ class Admin extends React.Component<IAdminProp, IAdminState> {
             })
             this.updateActivetab(this.props.location.pathname)
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 

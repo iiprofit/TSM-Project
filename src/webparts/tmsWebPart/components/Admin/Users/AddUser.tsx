@@ -391,7 +391,6 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                       name: x.Title,
                   }))
             : []
-        console.log(_data)
         this.setState({
             usersValues: _data,
         })
@@ -412,7 +411,6 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
      * This Method Check That User Must enter Minimum 3 Character Then Search Funtion Can Be Called
      */
     private onEmailInputChange = (searchText: string) => {
-        console.log(searchText)
         searchText.length > 2 && this.fetchUsersFromAD(searchText)
     }
 

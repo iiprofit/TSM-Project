@@ -17,9 +17,9 @@ export const listGuids = {
 export const listTitles = {
     USER_ROLE_TABLE: "User Roles Table",
     CUSTOMER_INFORMATION: "Customer Information",
-    PRODUCT_INFORMATION: "Product Information",
+    PRODUCT_INFORMATION: "Product Master",
     STATUS_TYPE: "Status Type",
-    TICKET_INFORMATION_TABLE: "Ticket Information Table",
+    TICKET_INFORMATION_TABLE: "Tickets",
     CHECKLIST_TRANSACTION_ITEM: "Checklist Transaction Item",
     DOCUMENT_UPLOAD_MASTER: "Document Upload Master",
 }

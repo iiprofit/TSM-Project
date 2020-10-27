@@ -174,7 +174,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
      * This Method Call All Supported Methods Which Fetch Data For Dropdown/Select Controls
      */
     public componentDidMount() {
-        console.log(this.props)
         if (this.props.mode === helper.Modes.Edit) {
             this.fetchTicketDetails(this.props.match.params.id)
         }
@@ -454,7 +453,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
      */
     private generateTicketId = ({ id }) => {
         try {
-            console.log(id)
             let newId = id + 1
             let len = id.toString().length
             let missingLen = 4 - len
@@ -689,7 +687,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 params.options
             )
             let result = await response.json()
-            console.log(result)
             let ticketId = this.generateTicketId({
                 id: result.value ? result.value[0].Id : 0,
             })
@@ -700,7 +697,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 listTitle: listTitles.TICKET_INFORMATION_TABLE,
                 body: {
                     __metadata: {
-                        type: "SP.Data.TicketInformationTableListItem",
+                        type: "SP.Data.TicketsListItem",
                     },
                     TicketNo: ticketId,
                     Title: ticketTitle,
@@ -742,7 +739,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                         fileParam.config,
                         fileParam.options
                     )
-                    console.log(response)
                 }
 
                 //send emails to respected users after transaction created
@@ -784,7 +780,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                     params.config,
                     params.options
                 )
-
+                message.success("Data Inserted Successfully")
                 this.setState({ isButtonLoading: false })
                 this.props.history.push("/ticketsection/in-progress/")
             } else {
@@ -821,7 +817,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             etag,
             body: {
                 __metadata: {
-                    type: "SP.Data.TicketInformationTableListItem",
+                    type: "SP.Data.TicketsListItem",
                 },
                 Title: ticketTitle,
                 CustomerDetailsId: customerNameSelected,
@@ -841,8 +837,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             params.config,
             params.options
         )
-        console.log(response)
-
         const willRemove = this.state.ticket.attachments.willRemove.value
         for (const f of willRemove) {
             const removeParams = helper.deleteAttachmentParams({
@@ -856,7 +850,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 removeParams.config,
                 removeParams.options
             )
-            console.log(removeResponse)
         }
 
         for (const f of attachmentFiles) {
@@ -875,7 +868,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 fileParam.config,
                 fileParam.options
             )
-            console.log(response)
         }
 
         //send emails to respected users after transaction created
@@ -913,7 +905,7 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             params.config,
             params.options
         )
-
+        message.success("Data Updated Successfully")
         this.setState({ isButtonLoading: false })
         this.props.history.push("/ticketsection/in-progress/")
     }
@@ -950,7 +942,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 etag: response.headers.get("ETag"),
             })
             const _item = result
-            console.log(result)
             this.setState((state) => ({
                 ticketNo: _item.TicketNo,
                 assignedToSelected: _item.AssignedToId,
@@ -1138,7 +1129,6 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     //         params.options
     //     )
     //     const result = await response.json()
-    //     console.log(result)
     // }
 }
 
