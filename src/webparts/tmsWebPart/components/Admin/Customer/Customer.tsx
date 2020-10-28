@@ -246,7 +246,7 @@ class Customer extends React.Component<ICustomerProp, ICustomerState> {
             let { customerSearch } = this.state
             let filterVariable: string = ""
             if (customerSearch) {
-                filterVariable = "$filter=CustomerName eq" + customerSearch
+                filterVariable = `$filter=CustomerName eq '${customerSearch}' or CustomerCity eq '${customerSearch}' or CustomerEmail eq '${customerSearch}'    `
             } else {
                 filterVariable = ""
             }

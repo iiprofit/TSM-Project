@@ -194,6 +194,7 @@ class Users extends React.Component<IUsersProp, IUsersState> {
         this.setState({ isLoading: true }, async () => {
             try {
                 let customfilter = this.customSearch()
+                console.log(customfilter)
                 const param = readItemsParams({
                     absoluteUrl: absUrl,
                     listTitle: listTitles.USER_ROLE_TABLE,
@@ -238,10 +239,7 @@ class Users extends React.Component<IUsersProp, IUsersState> {
             let filterVariable: string = ""
             if (userSearch) {
                 filterVariable =
-                    "&$filter=FirstName eq" +
-                    userSearch +
-                    "or Email/EMail eq" +
-                    userSearch
+                    filterVariable = `&$filter=FirstName eq '${userSearch}' or Email/EMail eq '${userSearch}'`
             } else {
                 filterVariable = ""
             }

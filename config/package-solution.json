@@ -3,7 +3,7 @@
   "solution": {
     "name": "tms-project-client-side-solution",
     "id": "97592328-e07e-4ea7-aae3-8b9c4b059092",
-    "version": "1.0.0.0",
+    "version": "1.0.0.1",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {

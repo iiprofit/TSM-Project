@@ -236,7 +236,7 @@ class StatusType extends React.Component<IStatusTypeProp, IStatusTypeState> {
             let filterVariable: string = ""
 
             if (statusTypeSearch) {
-                filterVariable = "$filter=StatusTypeName eq" + statusTypeSearch
+                filterVariable = `$filter=StatusTypeName eq '${statusTypeSearch}'`
             } else {
                 filterVariable = ""
             }

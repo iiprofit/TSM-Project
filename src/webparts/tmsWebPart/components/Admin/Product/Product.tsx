@@ -230,7 +230,7 @@ class Product extends React.Component<IProductProp, IProductState> {
             let filterVariable: string = ""
 
             if (productSearch) {
-                filterVariable = "$filter=ProductName eq" + productSearch
+                filterVariable = `$filter=ProductName eq '${productSearch}'`
             } else {
                 filterVariable = ""
             }
