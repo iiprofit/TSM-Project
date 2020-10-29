@@ -35,6 +35,7 @@ import {
     Space,
     Upload,
     List,
+    PageHeader,
 } from "antd"
 
 /**
@@ -104,6 +105,8 @@ type INewTicketStates = {
     ticketStatusSelected: Array<any>
     ticketTitle?: string
     validated: boolean
+    formTitle: string
+    formDescription: string
     ticket: {
         id: { value: number }
         attachments: {
@@ -156,6 +159,8 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
         description: null,
         etag: null,
         attachmentFiles: [],
+        formTitle: "",
+        formDescription: "",
         ticket: {
             id: { value: null },
             attachments: {
@@ -176,7 +181,15 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
     public componentDidMount() {
         if (this.props.mode === helper.Modes.Edit) {
             this.fetchTicketDetails(this.props.match.params.id)
+            this.setState({
+                formTitle: "Edit Ticket Details",
+                formDescription: "Please provide all details to update ticket details.",
+            })
         }
+        this.setState({
+            formTitle: "Create New Ticket",
+            formDescription: "Please provide all details to create new ticket.",
+        })
         this.onSearchParamsFetch().then(() => {
             this.onRequestereFetch()
             this.onFetchCustomer()
@@ -212,6 +225,8 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
             allUserData,
             comment,
             description,
+            formTitle,
+            formDescription,
         } = this.state
 
         /**
@@ -228,7 +243,29 @@ class NewTicket extends React.Component<INewTicketProp, INewTicketStates> {
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                    <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title={formTitle}
+                                    subTitle={formDescription}
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form
+                        {...layout}
+                        labelAlign="left"
+                        style={{
+                            margin: "1%",
+                        }}
+                    >
                         {/* Ticket Title Section Start  */}
                         <Form.Item label="Title">
                             <Input

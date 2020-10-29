@@ -42,7 +42,7 @@ import { IAddCustomerProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form, Radio } from "antd"
+import { Row, Col, Input, Button, message, Spin, Form, Radio , PageHeader } from "antd"
 
 /**
  * Ant Design Icons Import
@@ -75,6 +75,8 @@ type IAddCustomerStates = {
     saveConfirm: boolean
     isLoading: boolean
     isButtonLoading: boolean
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -101,6 +103,8 @@ class AddCustomer extends React.Component<
         saveConfirm: false,
         isLoading: false,
         isButtonLoading: false,
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -140,7 +144,25 @@ class AddCustomer extends React.Component<
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Add New Customer"
+                                    subTitle="Please provide all details to add new customer"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form {...layout} labelAlign="left" style={{
+                            margin: "1%",
+                        }}>
                         {/* Customer Name Section Start  */}
                         <Form.Item label="Customer Name">
                             <Input

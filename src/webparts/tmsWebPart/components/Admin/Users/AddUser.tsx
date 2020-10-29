@@ -51,6 +51,7 @@ import {
     Form,
     Radio,
     Checkbox,
+    PageHeader
 } from "antd"
 
 /**
@@ -89,6 +90,8 @@ type IAddUserStates = {
     isButtonLoading: boolean
     roleOptions: Array<any>
     DefaultroleOptions: Array<any>
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -119,6 +122,8 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
             { label: "Requester", value: "requester" },
         ],
         DefaultroleOptions: [],
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -160,7 +165,25 @@ class AddUser extends React.Component<IAddUserProp, IAddUserStates> {
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Add New User"
+                                    subTitle="Please provide all details to add new User"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form {...layout} labelAlign="left" style={{
+                            margin: "1%",
+                        }}>
                         {/* User Name Section Start  */}
                         <Form.Item label="User Name">
                             <Select

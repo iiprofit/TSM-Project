@@ -52,6 +52,7 @@ import {
     Spin,
     Form,
     Radio,
+    PageHeader
 } from "antd"
 
 /**
@@ -86,6 +87,8 @@ type IAddProductStates = {
     saveConfirm: boolean
     isLoading: boolean
     isButtonLoading: boolean
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -107,6 +110,8 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
         saveConfirm: false,
         isLoading: false,
         isButtonLoading: false,
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -135,7 +140,25 @@ class AddProduct extends React.Component<IAddProductProp, IAddProductStates> {
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Add New Product"
+                                    subTitle="Please provide all details to add new Product"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form {...layout} labelAlign="left"  style={{
+                            margin: "1%",
+                        }}>
                         {/* Product Section Start */}
                         <Form.Item label="Product Name">
                             <Input

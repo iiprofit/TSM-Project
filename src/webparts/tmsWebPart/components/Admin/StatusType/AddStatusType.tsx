@@ -42,7 +42,7 @@ import { IAddStatusTypeProp } from "../../../Store/Types"
 /**
  * Ant Deisgn Component Imports
  */
-import { Row, Col, Input, Button, message, Spin, Form, Radio } from "antd"
+import { Row, Col, Input, Button, message, Spin, Form, Radio , PageHeader } from "antd"
 
 /**
  * Ant Design Icons Import
@@ -73,6 +73,8 @@ type IAddStatusTypeStates = {
     saveConfirm: boolean
     isLoading: boolean
     isButtonLoading: boolean
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -97,6 +99,8 @@ class AddStatusType extends React.Component<
         saveConfirm: false,
         isLoading: false,
         isButtonLoading: false,
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -130,7 +134,25 @@ class AddStatusType extends React.Component<
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Add New Status Type"
+                                    subTitle="Please provide all details to add new status type"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form {...layout} labelAlign="left" style={{
+                            margin: "1%",
+                        }}>
                         {/* Status Type Name Section Start */}
                         <Form.Item label="Status Type Name">
                             <Input

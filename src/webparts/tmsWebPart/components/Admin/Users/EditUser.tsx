@@ -38,6 +38,7 @@ import {
     Form,
     Radio,
     Checkbox,
+    PageHeader,
 } from "antd"
 
 /**
@@ -85,6 +86,8 @@ type IEditUserState = {
     roleOptions: Array<any>
     DefaultroleOptions: Array<any>
     selectedRole: any
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -117,6 +120,8 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
         ],
         selectedRole: null,
         DefaultroleOptions: [],
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -164,7 +169,29 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                    <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Edit Status Type Details"
+                                    subTitle="Please provide all details to update status type details"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form
+                        {...layout}
+                        labelAlign="left"
+                        style={{
+                            margin: "1%",
+                        }}
+                    >
                         {/* User Name Section Start  */}
                         <Form.Item label="User Name">
                             <Select
@@ -289,7 +316,6 @@ class EditUser extends React.Component<IEditUserProp, IEditUserState> {
             console.error("Error while fetchUserDetails", error)
         }
     }
-
 
     // On form submit - on Update button click
     private handleSubmit = () => {

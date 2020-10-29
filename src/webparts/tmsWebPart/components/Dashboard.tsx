@@ -11,7 +11,8 @@ import * as React from "react"
  */
 import { Route, Redirect } from "react-router-dom"
 
-import { Tabs, Row, Col } from "antd"
+import { Tabs, Row, Col, Breadcrumb } from "antd"
+import { HomeOutlined, UserOutlined } from "@ant-design/icons"
 
 const { TabPane } = Tabs
 
@@ -57,6 +58,16 @@ import * as helper from "../helper"
 type IDashboardState = {
     activeTab: any
     routeDisplayName: string
+    breadCrumbItems: BreadcrumbItem[]
+}
+
+/**
+ * Breadcrumb State Types
+ */
+export interface BreadcrumbItem {
+    active: boolean
+    link?: string
+    name: string
 }
 
 class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
@@ -65,6 +76,7 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     public state: IDashboardState = {
         activeTab: "",
         routeDisplayName: null,
+        breadCrumbItems: [],
     }
 
     public historyListener: UnregisterCallback = null
@@ -72,6 +84,16 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
     // Component Did Mount Method
     public componentDidMount() {
         try {
+            this.props.history.listen((location) => {
+                let items = this.updateBreadcrumb(location.pathname).map((x) =>
+                    //@ts-ignore
+                    Object.assign({}, x)
+                )
+                this.setState({
+                    breadCrumbItems: items,
+                })
+            })
+
             this.historyListener = this.props.history.listen((location) => {
                 this.updateActivetab(location.pathname)
                 this.updateRouteDisplayName(location.pathname)
@@ -92,13 +114,163 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
         }
     }
 
+    /**
+     * This method generate breadcrumb for each section.
+     * @param path This param provide location information to the funtion.
+     */
+    private updateBreadcrumb = (path: string): BreadcrumbItem[] => {
+        try {
+            if (path === "/ticketsection/new-ticket")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "New Ticket",
+                    },
+                ]
+            else if (path === "/ticketsection/edit-ticket/:id")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "Edit Ticket",
+                    },
+                ]
+            else if (path === "/ticketsection/in-progress")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "In-Prgoress Tickets",
+                    },
+                ]
+            else if (path === "/ticketsection/closed-tickets")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "Closed Tickets",
+                    },
+                ]
+            else if (path === "/ticketsection/due-tickets")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "Due Tickets",
+                    },
+                ]
+            else if (path === "/ticketsection/due-todays-tickets")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "Todays-Due Tickets",
+                    },
+                ]
+            else if (path === "/ticketsection/tat-tickets")
+                return [
+                    {
+                        active: true,
+                        name: "Ticket Section",
+                    },
+                    {
+                        active: true,
+                        name: "TAT Tickets",
+                    },
+                ]
+            else if (path === "/admin/users")
+                return [
+                    {
+                        active: true,
+                        name: "Admin",
+                    },
+                    {
+                        active: true,
+                        name: "Users",
+                    },
+                ]
+            else if (path === "/admin/users")
+                return [
+                    {
+                        active: true,
+                        name: "Admin",
+                    },
+                    {
+                        active: true,
+                        name: "Users",
+                    },
+                ]
+            else if (path === "/admin/status-type")
+                return [
+                    {
+                        active: true,
+                        name: "Admin",
+                    },
+                    {
+                        active: true,
+                        name: "Status Type",
+                    },
+                ]
+            else if (path === "/admin/product-information")
+                return [
+                    {
+                        active: true,
+                        name: "Admin",
+                    },
+                    {
+                        active: true,
+                        name: "Product Information",
+                    },
+                ]
+            else if (path === "/admin/customer-information")
+                return [
+                    {
+                        active: true,
+                        name: "Admin",
+                    },
+                    {
+                        active: true,
+                        name: "Customer Information",
+                    },
+                ]
+            else if (path === "/search-section")
+                return [
+                    {
+                        active: true,
+                        name: "Search Section",
+                    },
+                ]
+        } catch (error) {
+            console.error("Error While Breadcrumb Method Exectution", error)
+        }
+    }
+
     // Render() For HTML Representation.
 
     public render(): React.ReactElement {
         /**
          * Desctructuring Of States And Props
          */
-        const { activeTab } = this.state
+        const { activeTab, breadCrumbItems } = this.state
         const { rights, isLoading } = this.props
         return (
             <>
@@ -116,6 +288,26 @@ class Dashboard extends React.Component<IDashboardProp, IDashboardState> {
                                     Version : {this.props.version}
                                 </p>
                             </div>
+                        </Col>
+                        <Col span={12}>
+                            <Breadcrumb>
+                                {breadCrumbItems ? (
+                                    breadCrumbItems.map((items) => (
+                                        <Breadcrumb.Item>
+                                            <span>{items.name}</span>
+                                        </Breadcrumb.Item>
+                                    ))
+                                ) : (
+                                    <div>
+                                        <Breadcrumb.Item>
+                                            <span>Ticket Section</span>
+                                        </Breadcrumb.Item>
+                                        <Breadcrumb.Item>
+                                            <span>In-Prgoress Tickets</span>
+                                        </Breadcrumb.Item>
+                                    </div>
+                                )}
+                            </Breadcrumb>
                         </Col>
                     </Row>
                     <Tabs onChange={this.onTabSelect} activeKey={activeTab}>

@@ -34,6 +34,7 @@ import {
     Form,
     Switch,
     Radio,
+    PageHeader,
 } from "antd"
 
 /**
@@ -68,6 +69,8 @@ type IEditCustomerStates = {
     etag: any
     isLoading: boolean
     isButtonLoading: boolean
+    formTitle: string
+    formDescription: string
 }
 
 //@ts-ignore
@@ -95,6 +98,8 @@ class IEditCustomer extends React.Component<
         etag: null,
         isButtonLoading: false,
         isLoading: false,
+        formTitle: "",
+        formDescription: "",
     }
 
     /**
@@ -143,7 +148,29 @@ class IEditCustomer extends React.Component<
                 {/* Spin Component Is Used For Loading Process */}
                 {/* We Need To impliment Is loading In Spin */}
                 <Spin spinning={isLoading} indicator={loadingIcon}>
-                    <Form {...layout} labelAlign="left">
+                    <Row>
+                        <Col span={24}>
+                            <div
+                                style={{
+                                    backgroundColor: "#f5f5f5",
+                                    padding: "2%",
+                                }}
+                            >
+                                <PageHeader
+                                    className="site-page-header"
+                                    title="Edit Customer Details"
+                                    subTitle="Please provide all details to update customer details"
+                                />
+                            </div>
+                        </Col>
+                    </Row>
+                    <Form
+                        {...layout}
+                        labelAlign="left"
+                        style={{
+                            margin: "1%",
+                        }}
+                    >
                         {/* Customer Name Section Start  */}
                         <Form.Item label="Customer Name">
                             <Input
